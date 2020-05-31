@@ -13,11 +13,26 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 socketio = SocketIO(app)
 
+myclient = None
+pokerDB = None
+userCollection = None
+
 deck = [card + 1 for card in range(52)]
+pool = 0
 money = 100
 bet = 10
 players = []
 
+def initDB():
+    global myclient, pokerDB, userCollection
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    pokerDB = myclient['poker']
+    userCollection = pokerDB['users']
+    if None in [myclient, pokerDB, userCollection]:
+        print("monogo Failed")
+        os._exit(0)
+    else:
+        print("mongo init success")
 
 def initCard():
     deck = [card + 1 for card in range(52)]
@@ -71,6 +86,14 @@ def client_deal(data):
     print(request.sid, playerCards, file=sys.stderr)
     socketio.emit('card_update', {"cards": playerCards})
 
+@socketio.on('call')
+def client_call(data):
+    global money, bet
+    print("call", request.sid, file=sys.stderr)
+    socketio.emit('money_update', {"money": money})
 
-initCard()
-socketio.run(app, debug=True, host='127.0.0.1', port=5000)
+
+if __name__ == "__main__":
+    initDB()
+    initCard()
+    socketio.run(app, debug=True, host='127.0.0.1', port=5000)
