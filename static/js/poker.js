@@ -62,28 +62,46 @@ function Player(){
 
     this.raise = function(){
         console.log("raise")
+        socket.emit('raise', {username: this.name, money: this.name})
     }
     this.call = function(){
         console.log("call")
+        socket.emit('call', {username: this.name, money: this.name})
     }
     this.check = function(){
         console.log("check")
+        socket.emit('check', {username: this.name, money: this.name})
     }
     this.fold = function(){
         console.log("fold")
+        this.ownCards = []
+        socket.emit('fold', {username: this.name, money: this.name})
     }
     this.allin = function(){
         console.log("allin")
+        this.allin = true
+        socket.emit('allin', {username: this.name, money: this.name})
     }
 }
 
 function join(){
-    var socket = io.connect();
+    socket = io.connect();
     // socket.emit('connect_event', {data: "test"})
     socket.on('server_response', function(msg) {
         var date = new Date();
         document.getElementById('status').append('<p>status: ' + msg.data + "Time:"+ date+ '</p>');
     })
+    socket.on('money_update', function(msg) {
+        document.getElementById('money').textContent = `your money: ${msg.money}`
+    })
+    socket.on('bet_update', function(msg) {
+        document.getElementById('bet').textContent = `bet: ${msg.bet}`
+    })
+    socket.on('card_update', function(msg) {
+        document.getElementById('bet').textContent = `bet: ${msg.bet}`
+    })
+
+
     document.getElementById('join').onclick = null
 
     player = new Player
