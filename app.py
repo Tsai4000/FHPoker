@@ -1,6 +1,7 @@
 import pymongo
 import sys
 import os
+import random
 
 from flask import Flask, jsonify, abort, request, render_template, make_response
 from flask_socketio import SocketIO, emit
@@ -12,8 +13,23 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 socketio = SocketIO(app)
 
+deck = [card + 1 for card in range(52)]
 money = 100
 bet = 10
+players = []
+
+
+def initCard():
+    deck = [card + 1 for card in range(52)]
+    times = random.randint(50, 100)
+    for _ in range(times):
+        for j in range(51):
+            a = random.randint(0,100)
+            b = random.randint(0,100)
+            if(a>b):
+                temp = deck[j]
+                deck[j] = deck[j+1]
+                deck[j+1] = temp
 
 @app.route('/' ,methods=['GET'])
 def index():
@@ -49,6 +65,12 @@ def client_raise(data):
     socketio.emit('money_update', {"money": money})
     socketio.emit('bet_update', {"bet": bet})
 
+@socketio.on('start')
+def client_deal(data):
+    playerCards = [deck.pop() for _ in range(2)]
+    print(request.sid, playerCards, file=sys.stderr)
+    socketio.emit('card_update', {"cards": playerCards})
 
 
+initCard()
 socketio.run(app, debug=True, host='127.0.0.1', port=5000)

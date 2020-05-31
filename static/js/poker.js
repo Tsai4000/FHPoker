@@ -60,6 +60,10 @@ function Player(){
     this.money = 0
     this.isAllin = false
 
+    this.start = function(){
+        console.log("start")
+        socket.emit("start", {username: this.name})
+    }
     this.raise = function(){
         console.log("raise")
         socket.emit('raise', {username: this.name, money: this.name})
@@ -98,7 +102,21 @@ function join(){
         document.getElementById('bet').textContent = `bet: ${msg.bet}`
     })
     socket.on('card_update', function(msg) {
-        document.getElementById('bet').textContent = `bet: ${msg.bet}`
+        cards = msg.cards.map(card => {
+            console.log(card-1)
+            suit = parseInt((card-1)/13) == 0 
+                ? "club" 
+                : parseInt((card-1)/13) == 1 
+                ? "diamond"
+                : parseInt((card-1)/13) == 2
+                ? "heart"
+                : parseInt((card-1)/13) == 3
+                ? "spade"
+                : "error"
+            number = card % 13 != 0 ? card%13 : 13
+            return `${suit}${number}`
+        });
+        document.getElementById('cards').textContent = `your cards: ${cards}`
     })
 
 
