@@ -62,44 +62,49 @@ function Player(){
 
     this.start = function(){
         console.log("start")
-        socket.emit("start", {username: this.name})
+        socket.emit("start", {name: this.name})
     }
     this.raise = function(){
         console.log("raise")
-        socket.emit('raise', {username: this.name, money: this.name})
+        socket.emit('raise', {name: this.name, money: this.money})
     }
     this.call = function(){
         console.log("call")
-        socket.emit('call', {username: this.name, money: this.name})
+        socket.emit('call', {name: this.name, money: this.money})
     }
     this.check = function(){
         console.log("check")
-        socket.emit('check', {username: this.name, money: this.name})
+        socket.emit('check', {name: this.name, money: this.money})
     }
     this.fold = function(){
         console.log("fold")
         this.ownCards = []
-        socket.emit('fold', {username: this.name, money: this.name})
+        socket.emit('fold', {name: this.name, money: this.money})
     }
     this.allin = function(){
         console.log("allin")
         this.allin = true
-        socket.emit('allin', {username: this.name, money: this.name})
+        socket.emit('allin', {name: this.name, money: this.money})
     }
 }
 
 function join(){
     socket = io.connect();
-    // socket.emit('connect_event', {data: "test"})
+    socket.emit('player_join', {name: "test", userCode: "testcode"})
+    player = new Player
     socket.on('server_response', function(msg) {
         var date = new Date();
         document.getElementById('status').append('<p>status: ' + msg.data + "Time:"+ date+ '</p>');
     })
     socket.on('money_update', function(msg) {
+        player.money = msg.money
         document.getElementById('money').textContent = `your money: ${msg.money}`
     })
     socket.on('bet_update', function(msg) {
         document.getElementById('bet').textContent = `bet: ${msg.bet}`
+    })
+    socket.on('pool_update', function(msg) {
+        document.getElementById('pool').textContent = `pool: ${msg.pool}`
     })
     socket.on('card_update', function(msg) {
         cards = msg.cards.map(card => {
@@ -116,11 +121,20 @@ function join(){
             number = card % 13 != 0 ? card%13 : 13
             return `${suit}${number}`
         });
-        document.getElementById('cards').textContent = `your cards: ${cards}`
+        player.cards = cards
+        document.getElementById('cards').textContent = `your cards: ${player.cards}`
     })
-
+    socket.on('online_user', function(msg){
+        document.getElementById('players').textContent = msg.playerList
+    })
+    socket.on('user_connect', function(msg){
+        player.name = msg.name
+        player.money = msg.money
+        document.getElementById('name').textContent = `player: ${player.name}`
+        document.getElementById('money').textContent = `your money: ${player.money}`
+    })
 
     document.getElementById('join').onclick = null
 
-    player = new Player
+    
 }
