@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>PoKer</title>
+    </head>
+    <body onunload='leave()'>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/poker.js') }}"></script>
+        <img src="{{ url_for('static', filename='images/asuka.jpg') }}">
+        <div id="status"><div>
+
+        <button id='join' onclick="join()">join</button>
+        
+        <button id='join' onclick="player.raise()">raise</button>
+        <button id='join' onclick="player.call()">call</button>
+        <button id='join' onclick="player.check()">money</button>
+        <button id='join' onclick="player.fold()">fold</button>
+        <button id='join' onclick="player.allin()">allin</button>
+    </body>
+</html>
