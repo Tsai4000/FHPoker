@@ -1,11 +1,12 @@
 cards = {}
 clients = []
 players = []
-onseat = []
+onseat = {}
 ready = []
 deck = []
 pool = 0
 bet = 0
+isReady = 0
 button = ""
 startPlayer = ""
 startPlayerBet = 0
@@ -20,12 +21,13 @@ def init():
     cards = {}
     clients = []
     players = []
-    onseat = []
+    onseat = {}
     ready = []
     deck = []
     pool = 0
     bet = 0
-    button = ""
+    isReady = 0
+    button = button
     startPlayer = ""
     startPlayerBet = 0
     turn = ""
@@ -33,3 +35,7 @@ def init():
     myclient = None
     pokerDB = None
     userCollection = None
+
+def nextRound():
+    global pool
+    pool = 0

@@ -30,21 +30,21 @@ def upload():
         "name": req['name'],
         "userCode": req['userCode'],
         "money": 5000
-    }
+    }# check name is exist or not
     glo.userCollection.insert_one(user)
     return make_response(jsonify(user), 200)
 
 @socketio.on('disconnect')
 def client_disconnect():
     glo.clients.remove(request.sid)
-    socketio.emit('online_user', {"clientList": glo.clients})
-    print('Client disconnected', file=sys.stderr)
+    socketio.emit('online_client', {"clientList": glo.clients})
+    print('Client '+request.sid+' disconnected', file=sys.stderr)
 
 @socketio.on('connect')
 def client_connect():
     glo.clients.append(request.sid)
     join_room('default', request.sid)
-    socketio.emit('online_user', {"clientList": glo.clients})
+    socketio.emit('online_client', {"clientList": glo.clients})
     print('Client '+request.sid+' connected', file=sys.stderr)
 
 @socketio.on('player_join')
@@ -53,13 +53,32 @@ def player_join(data):
         "name": data['name'], 
         "userCode": data['userCode']
     })
-    glo.players.append(request.sid)
-    socketio.emit('user_connect', {
-        "name": user["name"], 
-        "money": user['money']
-    }, room=request.sid)
-    socketio.emit('onseat_user', {"playerList": glo.players})
-    print('Player '+user['name']+' joined', file=sys.stderr)
+    if(user==None):
+        print('Join failed', file=sys.stderr)
+    else:
+        glo.players.append(request.sid)
+        socketio.emit('user_connect', {
+            "name": user["name"], 
+            "money": user['money']
+        }, room=request.sid)
+        socketio.emit('online_user', {"playerList": glo.players})
+        print('Player '+user['name']+' joined', file=sys.stderr)
+
+@socketio.on('sit')
+def player_sit(data):
+    user = glo.userCollection.find_one({"name": data['name']})
+    glo.onseat[data.seat] = {"name": data.name, "money": user['money'], "isReady": False}
+    socketio.emit('player_update', glo.onseat)
+    print('Seat:', glo.onseat, file=sys.stderr)
+
+@socketio.on('click_ready')
+def player_ready(data):
+    glo.isReady += -1 if glo.onseat[data.seat]['isReady'] else 1
+    glo.onseat[data.seat]['isReady'] = not glo.onseat[data.seat]['isReady']
+    socketio.emit('player_update', glo.onseat)
+    if(len(glo.onseat) == glo.isReady):
+        # deal, turn
+        socketio.emit("card_update", )# TODO
 
 @socketio.on('raise')
 def client_raise(data):
