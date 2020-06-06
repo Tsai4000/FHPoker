@@ -24,3 +24,11 @@ def initDB():
         os._exit(0)
     else:
         print("mongo init success")
+
+def sortSeat(seats):
+    temp = {}
+    for seat in sorted(seats.keys()):
+        temp[seat] = seats[seat]
+    for i in range(-1, len(sorted(temp.keys(), reverse=True))-1):
+        temp[len(sorted(temp.keys(), reverse=True))[i]]["nextSeat"] = len(sorted(temp.keys(), reverse=True))[i+1]
+    return temp
