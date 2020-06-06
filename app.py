@@ -39,14 +39,14 @@ def client_disconnect():
     glo.clients.remove(request.sid)
     socketio.emit('online_client', {"clientList": glo.clients})
     print('Client '+request.sid+' disconnected', file=sys.stderr)
-
+# TODO: handle player quit update
 @socketio.on('connect')
 def client_connect():
     glo.clients.append(request.sid)
     join_room('default', request.sid)
     socketio.emit('online_client', {"clientList": glo.clients})
     print('Client '+request.sid+' connected', file=sys.stderr)
-
+# TODO: handle player join and playerdata match
 @socketio.on('player_join')
 def player_join(data):
     user = glo.userCollection.find_one({
@@ -67,7 +67,7 @@ def player_join(data):
 @socketio.on('sit')
 def player_sit(data):
     user = glo.userCollection.find_one({"name": data['name']})
-    glo.onseat[data.seat] = {"name": data.name, "money": user['money'], "isReady": False}
+    glo.onseat[data.seat] = {"name": data.name, "money": user['money'], "bet": 0, "isReady": False, "isFold": False}
     socketio.emit('player_update', glo.onseat)
     print('Seat:', glo.onseat, file=sys.stderr)
 
@@ -77,27 +77,24 @@ def player_ready(data):
     glo.onseat[data.seat]['isReady'] = not glo.onseat[data.seat]['isReady']
     socketio.emit('player_update', glo.onseat)
     if(len(glo.onseat) == glo.isReady):
-        # deal, turn
-        socketio.emit("card_update", )# TODO
+        socketio.emit("card_update", )# TODO: deal, button , turn,startPlayer
 
 @socketio.on('raise')
 def client_raise(data):
     print("raise", data, request.sid, file=sys.stderr)
-    glo.bet = glo.bet * 2
-    glo.userCollection.update_one(
-        {"name": data['name']}, 
-        {"$set": {"money": data['money']-glo.bet}}
-    )
-    glo.pool = glo.pool + glo.bet
-    socketio.emit('money_update', {"money": data['money']-glo.bet}, room=request.sid)
-    socketio.emit('glo.bet_update', {"glo.bet": glo.bet})
-    socketio.emit('glo.pool_update', {"glo.pool": glo.pool})
-
-@socketio.on('start')
-def client_deal(data):
-    playerCards = [glo.deck.pop() for _ in range(2)]
-    print(request.sid, playerCards, file=sys.stderr)
-    socketio.emit('card_update', {"cards": playerCards}, room=request.sid)
+    if(glo.onseat[data.seat]['money']+glo.onseat[data.seat]['bet']>=glo.bet*2):
+        glo.bet = glo.bet * 2
+        glo.userCollection.update_one(
+            {"name": glo.onseat[data.seat]['name']}, 
+            {"$set": {"money": glo.onseat[data.seat]['money']-(glo.bet+glo.onseat[data.seat]['bet'])}}
+        )
+        glo.pool = glo.pool + glo.bet - glo.onseat[data.seat]['bet']
+        glo.onseat[data.seat]['bet'] = glo.bet
+        glo.onseat[data.seat]['money'] = glo.onseat[data.seat]['money']-(glo.bet+glo.onseat[data.seat]['bet'])
+        # TODO: need check
+        socketio.emit('player_update', glo.onseat)
+        socketio.emit('bet_update', {"bet": glo.bet})
+        socketio.emit('pool_update', {"pool": glo.pool})
 
 @socketio.on('call')
 def client_call(data):
@@ -119,9 +116,14 @@ def client_allin(data):
     socketio.emit('money_update', {"money": 0}, room=request.sid)
     socketio.emit('glo.pool_update', {"glo.pool": glo.pool})
 
-@socketio.on('check')
+@socketio.on('fold')
 def client_fold(data):
-    print('fold ', request.sid, file=sys.stderr)
+    print('fold ', data.seat, file=sys.stderr)
+    glo.onseat[data.seat]['isFold'] = True
+
+@socketio.on('check')
+def client_check(data):
+    print('check ', request.sid, file=sys.stderr)
     glo.players.remove(request.sid)
 
 if __name__ == "__main__":
