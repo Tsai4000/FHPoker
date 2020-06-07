@@ -12,13 +12,14 @@ startPlayer = ""
 startPlayerBet = 0
 turn = ""
 rounds = 0
+publicCards = []
 
 myclient = None
 pokerDB = None
 userCollection = None
 
 def init():
-    global cards, clients, players, onseat, ready, pool, bet, button, startPlayer, startPlayerBet, turn, deck, myclient, pokerDB, userCollection, isReady, rounds 
+    global cards, clients, players, onseat, ready, pool, bet, button, startPlayer, startPlayerBet, turn, deck, myclient, pokerDB, userCollection, isReady, rounds, publicCards 
     cards = {}
     clients = []
     players = []
@@ -33,6 +34,7 @@ def init():
     startPlayerBet = 0
     turn = ""
     rounds = 0
+    publicCards = []
 
     myclient = None
     pokerDB = None

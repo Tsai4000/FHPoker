@@ -27,8 +27,10 @@ def initDB():
 
 def sortSeat(seats):
     temp = {}
+    seatLength = len(sorted(temp.keys(), reverse=True))
     for seat in sorted(seats.keys()):
         temp[seat] = seats[seat]
-    for i in range(-1, len(sorted(temp.keys(), reverse=True))-1):
-        temp[len(sorted(temp.keys(), reverse=True))[i]]["nextSeat"] = len(sorted(temp.keys(), reverse=True))[i+1]
+    for i in range(-1, seatLength-1):
+        temp[seatLength[i]]["nextSeat"] = seatLength[i+1]
+        temp[seatLength[i]]["prevSeat"] = seatLength[i-1]
     return temp
