@@ -3,6 +3,17 @@ import random
 import pymongo
 import os
 
+COEF = {'37': 97425, 
+        '34': 28239, 
+        '26': 4568, 
+        '24': 929, 
+        '23': 325, 
+        '22': 97, 
+        '18': 19, 
+        '14': 4, 
+        '10':1
+}
+
 def initDeck():
     glo.deck = [card + 1 for card in range(52)]
     times = random.randint(50, 100)
@@ -51,12 +62,12 @@ def cardScore(cards):
     suits = set(cards[1::3])
     is_flush = len(suits) == 1
     is_straight = values in CARD or values == 'A2345'
-    return (2 * sum(values.count(card) for card in values) #不同卡牌计数
-        + 13 * is_straight + 14 * is_flush, #顺子*13，同花*15
+    coIdx = 2 * sum(values.count(card) for card in values)+ 13 * is_straight + 14 * is_flush
+    return (sum(COEF[str(coIdx)]*(CARD.index(card)+2) for card in values[::-1]),
         [CARD.index(card)+2 for card in values[::-1]])
 
 def gameResult():
-    for seat in glo.cards:
+    for index ,seat in enumerate(glo.cards):
         maxScore = 0
         maxCards = None
         hand= []
@@ -71,13 +82,14 @@ def gameResult():
         glo.cards[seat] = (maxScore, maxCards)
 
 # def main():
-#     print(glo.cards, glo.publicCards)
-#     glo.publicCards = [3,41,5,22,4]
-#     glo.cards["seat1"] = [7,6]
-#     glo.cards['seat2'] = [20,19]
-#     glo.cards['seat3'] = [11,29]
+#     glo.publicCards = [14,26,12,11,3]
+#     glo.cards["seat1"] = [27,4]
+#     glo.cards['seat2'] = [40,5]
+#     glo.cards['seat3'] = [19,29]
 #     glo.cards['seat4'] = [51,33]
-#     glo.cards['seat5'] = [23,43]
+#     glo.cards['seat5'] = [25,40]
+#     print(glo.cards, glo.publicCards)
+
 #     gameResult()
 #     print(glo.cards)
 
