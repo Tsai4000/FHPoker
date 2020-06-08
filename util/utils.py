@@ -34,3 +34,51 @@ def sortSeat(seats):
         temp[seatLength[i]]["nextSeat"] = seatLength[i+1]
         temp[seatLength[i]]["prevSeat"] = seatLength[i-1]
     return temp
+
+def cardHandle(cards):
+    cardNum = "KA23456789TJQ"
+    cardSuit = 'CDHS'
+    mycard = ""
+    for card in cards:
+        suit = cardSuit[(card-1)//13]
+        num = cardNum[card%13]
+        mycard = mycard+f"{num}{suit} "
+    return mycard
+
+def cardScore(cards):
+    CARD = "23456789TJQKA"
+    values = ''.join(sorted(cards[::3], key=CARD.index))
+    suits = set(cards[1::3])
+    is_flush = len(suits) == 1
+    is_straight = values in CARD or values == 'A2345'
+    return (2 * sum(values.count(card) for card in values) #不同卡牌计数
+        + 13 * is_straight + 14 * is_flush, #顺子*13，同花*15
+        [CARD.index(card)+2 for card in values[::-1]])
+
+def gameResult():
+    for seat in glo.cards:
+        maxScore = 0
+        maxCards = None
+        hand= []
+        hand = glo.cards[seat]+glo.publicCards
+        for i in range(0,5):
+            for j in range(i+1,6):
+                cards = cardHandle(hand[:i]+hand[i+1:j]+hand[j+1:])
+                (score, cards) = cardScore(cards)
+                if(score>=maxScore):
+                    maxScore = score
+                    maxCards = cards
+        glo.cards[seat] = (maxScore, maxCards)
+
+# def main():
+#     print(glo.cards, glo.publicCards)
+#     glo.publicCards = [3,41,5,22,4]
+#     glo.cards["seat1"] = [7,6]
+#     glo.cards['seat2'] = [20,19]
+#     glo.cards['seat3'] = [11,29]
+#     glo.cards['seat4'] = [51,33]
+#     glo.cards['seat5'] = [23,43]
+#     gameResult()
+#     print(glo.cards)
+
+# main()

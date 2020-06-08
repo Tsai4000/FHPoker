@@ -186,11 +186,11 @@ def client_fold(data):
     if(data.seat == glo.turn):
         glo.cards.pop(data.seat, None)
         glo.onseat[data.seat]['isFold'] = True
+        prevSeat = glo.onseat[data.seat]['prevSeat']
+        nextSeat = glo.onseat[data.seat]['nextSeat']
         if(glo.startPlayer == data.seat):
             glo.startPlayer = prevSeat
         glo.turn = glo.onseat[glo.turn]['nextSeat']
-        prevSeat = glo.onseat[data.seat]['prevSeat']
-        nextSeat = glo.onseat[data.seat]['nextSeat']
         glo.onseat[prevSeat]['nextSeat'] = nextSeat
         glo.onseat[nextSeat]['prevSeat'] = prevSeat
         if(glo.onseat[data.seat]['nextSeat'] == glo.onseat[data.seat]['prevSeat']):
