@@ -49,16 +49,14 @@ def foldCard(data):
     glo.onseat[prevSeat]['nextSeat'] = nextSeat
     glo.onseat[nextSeat]['prevSeat'] = prevSeat
 
-def checkGameSet():
-    """
-    check is last round or not
-    """
-    if(glo.onseat[glo.turn]['nextSeat'] == glo.startPlayer and glo.bet == glo.onseat[glo.onseat[glo.turn]['nextSeat']]['bet']):
-        if(len(glo.publicCards)<5):
-            glo.deck.pop()
-            glo.publicCards.append(glo.deck.pop())
-        else:
-            print("end")
-            ut.gameResult()
-            ut.prizePool()
-            # game result
+def isRoundEnd():
+    return (glo.onseat[glo.turn]['nextSeat'] == glo.startPlayer 
+        and (glo.bet == glo.onseat[glo.onseat[glo.turn]['nextSeat']]['bet']
+          or glo.onseat[glo.onseat[glo.turn]['nextSeat']]['isAllin']))
+
+def isGameSet():
+    return len(glo.publicCards)>=5
+
+def showDown():
+    for player in glo.cards:
+        glo.onseat[player]['hand'] = glo.cards[player] 
