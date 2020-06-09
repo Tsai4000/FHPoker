@@ -38,13 +38,44 @@ def initDB():
 
 def sortSeat(seats):
     temp = {}
-    seatLength = len(sorted(temp.keys(), reverse=True))
     for seat in sorted(seats.keys()):
         temp[seat] = seats[seat]
-    for i in range(-1, seatLength-1):
-        temp[seatLength[i]]["nextSeat"] = seatLength[i+1]
-        temp[seatLength[i]]["prevSeat"] = seatLength[i-1]
+    seatList = sorted(temp.keys(), reverse=True)
+    for i in range(-1, len(seatList)-1):
+        temp[seatList[i]]["nextSeat"] = seatList[i+1]
+        temp[seatList[i]]["prevSeat"] = seatList[i-1]
     return temp
+
+def getWinner(cards):
+    score = sorted(cards.values(), reverse=True)[0]
+    winner = []
+    for card in cards:
+        if cards[card]==score:
+            winner.append(card)
+    return winner
+
+def prizePool():
+    while(glo.pool>0):
+        winner = getWinner(glo.cards)
+        money = 0
+        bet = min([glo.onseat[player]['bet'] for player in winner])
+        for player in winner:
+            if(glo.onseat[player].get('isAllin', None)):
+                money = bet*len(glo.cards)//len(winner)
+                money = money if money<=glo.pool else glo.pool
+            else:
+                money = glo.pool
+            glo.pool -= money
+            glo.userCollection.update_one(
+                {"name": glo.onseat[player]['name']}, 
+                {"$inc": {"money": money}}
+            )
+        for seat in glo.onseat:
+            glo.onseat[seat]['bet'] -= bet if glo.onseat[seat]['bet']>0 else 0
+            if glo.onseat[seat]['bet']<=0:
+                glo.cards.popItem(seat, None)
+        
+            
 
 def cardHandle(cards):
     cardNum = "KA23456789TJQ"

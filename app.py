@@ -83,11 +83,9 @@ def player_ready(data):
     glo.onseat[data.seat]['isReady'] = not glo.onseat[data.seat]['isReady']
     if(len(glo.onseat) == glo.isReady and len(glo.onseat) != 1):
         glo.onseat = ut.sortSeat(glo.onseat)
-        if(glo.firstRound):
-            glo.button = sorted(glo.onseat.keys())[0]
-        else:
-            glo.rounds += 1
-            glo.button = sorted(glo.onseat.keys())[glo.rounds%len(glo.onseat)]
+
+        glo.button = sorted(glo.onseat.keys())[glo.rounds%len(glo.onseat)]
+        glo.rounds += 1
 
         sb = glo.onseat[glo.onseat[glo.button]['nextSeat']]
         glo.onseat[glo.onseat[glo.button]['nextSeat']]['money'] -= 10
@@ -130,6 +128,8 @@ def client_raise(data):
                 glo.publicCards.append(glo.deck.pop())
             else:
                 print("end")
+                ut.gameResult()
+                ut.prizePool()
                 # game result
         glo.turn = glo.onseat[glo.turn]['nextSeat']
         socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
@@ -153,6 +153,8 @@ def client_call(data):
                 glo.publicCards.append(glo.deck.pop())
             else:
                 print("end")
+                ut.gameResult()
+                ut.prizePool()
                 # game result
         glo.turn = glo.onseat[glo.turn]['nextSeat']
         socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
@@ -166,6 +168,7 @@ def client_allin(data):
         user = glo.userCollection.find_one({"name": data['name']})
         glo.pool = glo.pool + user['money']
         glo.bet = user['money'] if user['money'] >= glo.bet else glo.bet
+        glo.onseat[data.seat]['isAllin'] = True
         glo.userCollection.update_one({"name": data['name']}, {"$set": {"money": 0}})
         if(glo.onseat[glo.turn]['nextSeat'] == glo.startPlayer and glo.bet == glo.onseat[glo.onseat[glo.turn]['nextSeat']]['bet']):
             if(len(glo.publicCards)<5):
@@ -173,6 +176,8 @@ def client_allin(data):
                 glo.publicCards.append(glo.deck.pop())
             else:
                 print("end")
+                ut.gameResult()
+                ut.prizePool()
                 # game result
         glo.turn = glo.onseat[glo.turn]['nextSeat']
         socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
@@ -195,6 +200,10 @@ def client_fold(data):
         glo.onseat[nextSeat]['prevSeat'] = prevSeat
         if(glo.onseat[data.seat]['nextSeat'] == glo.onseat[data.seat]['prevSeat']):
             print("end")
+            glo.userCollection.update_one(
+                {"name": glo.onseat[glo.cards.keys()[0]]['name']}, 
+                {"$inc": {"money": glo.pool}}
+            )
             #game result
         socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
         socketio.emit('player_update', glo.onseat)
@@ -209,6 +218,8 @@ def client_check(data):
                 glo.publicCards.append(glo.deck.pop())
             else:
                 print("end")
+                ut.gameResult()
+                ut.prizePool()
                 # game result
         glo.turn = glo.onseat[glo.turn]['nextSeat']
         socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
