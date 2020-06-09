@@ -77,8 +77,8 @@ def player_join(data):
 @socketio.on('sit')
 def player_sit(data):
     user = glo.userCollection.find_one({"name": data['name']})
-    glo.onseat[data.seat] = {
-        "name": data.name, 
+    glo.onseat[data['seat']] = {
+        "name": data['name'], 
         "money": user['money'], 
         "bet": 0, 
         'hand': [0,0], 
