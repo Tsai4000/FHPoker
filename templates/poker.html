@@ -1,28 +1,42 @@
 <html>
-    <head>
-        <title>PoKer</title>
-    </head>
-    <body onunload='leave()'>
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/poker.js') }}"></script>
-        <img src="{{ url_for('static', filename='images/asuka.jpg') }}">
-        <div id="status"><div>
 
-        <button id='join' onclick="join()">join</button>
-        <p>
-            <div id="money">your money: 0</div>
-            <div id="bet">bet: 0</div>
-            <div id="cards">your cards:</div>
-            <div id="publicCards">public cards:</div>
-            <div id="name">player:</div>
-            <div id="pool">pool:</div>
-        </p>
-        <button id='join' onclick="player.start()">start</button>
-        <button id='join' onclick="player.raise()">raise</button>
-        <button id='join' onclick="player.call()">call</button>
-        <button id='join' onclick="player.check()">money</button>
-        <button id='join' onclick="player.fold()">fold</button>
-        <button id='join' onclick="player.allin()">allin</button>
-        <div id="players"></div>
-    </body>
+<head>
+	<title>PoKer</title>
+</head>
+
+<body onunload='leave()'>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/poker.js') }}"></script>
+	<img src="{{ url_for('static', filename='images/asuka.jpg') }}">
+	<div id="status">
+		<div>
+
+			<button id='connect' onclick="connect()">join</button>
+			<p>
+				<div id="money">your money: 0</div>
+				<div id="bet">bet: 0</div>
+				<div id="pool">pool:</div>
+				<div id="cards">your cards:</div>
+				<div id="publicCards">public cards:</div>
+				<div id="name">name:</div>
+				<div id='button'>button:</div>
+				<div id='turn'>turn:</div>
+				<div id='sb'>sb:</div>
+
+			</p>
+			<div>
+				<div>name</div><input id='username' type='text'>
+				<div>usercode</div><input id='usercode' type='text'>
+			</div>
+			<button id='join' , onclick="player.join()">join</button>
+			<button id='sit' onclick="player.sit()">sit</button>
+			<button id='ready' onclick="player.ready()">ready</button>
+			<button id='raise' onclick="player.raise()">raise</button>
+			<button id='call' onclick="player.call()">call</button>
+			<button id='check' onclick="player.check()">money</button>
+			<button id='fold' onclick="player.fold()">fold</button>
+			<button id='allin' onclick="player.allin()">allin</button>
+			<div id="players"></div>
+</body>
+
 </html>
