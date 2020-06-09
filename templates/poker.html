@@ -25,11 +25,14 @@
 
 			</p>
 			<div>
-				<div>name</div><input id='username' type='text'>
-				<div>usercode</div><input id='usercode' type='text'>
+				<div>name</div><input id='username' type='text' value='test'>
+				<div>usercode</div><input id='usercode' type='text' value='testcode'>
 			</div>
 			<button id='join' , onclick="player.join()">join</button>
-			<button id='sit' onclick="player.sit()">sit</button>
+			<button id='seat1' onclick="player.sit('seat1')">seat1</button>
+			<button id='seat2' onclick="player.sit('seat2')">seat2</button>
+			<button id='seat3' onclick="player.sit('seat3')">seat3</button>
+			<button id='seat4' onclick="player.sit('seat4')">seat4</button>
 			<button id='ready' onclick="player.ready()">ready</button>
 			<button id='raise' onclick="player.raise()">raise</button>
 			<button id='call' onclick="player.call()">call</button>

@@ -28,12 +28,18 @@ function Player() {
   this.name = ""
   this.money = 0
   this.isAllin = false
+  this.seat = ""
 
   this.join = function () {
     console.log('join')
     name = document.getElementById('username').value
     userCode = document.getElementById('usercode').value
     socket.emit("player_join", { name: name, userCode: userCode })
+  }
+  this.sit = function (seat) {
+    this.seat = seat
+    console.log(this.seat)
+    socket.emit('sit', { name: this.name, seat: this.seat })
   }
   this.raise = function () {
     console.log("raise")
@@ -109,6 +115,10 @@ function connect() {
     } else {
       alert('join failed')
     }
+  })
+  socket.on('player_update', function (players) {
+    console.log(players)
+    // document.getElementById("players").textContent = players.seat1
   })
 
   document.getElementById("connect").onclick = null
