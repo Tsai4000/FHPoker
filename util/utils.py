@@ -46,6 +46,18 @@ def sortSeat(seats):
         temp[seatList[i]]["prevSeat"] = seatList[i-1]
     return temp
 
+def dealPublicCard3():
+    glo.deck.pop()
+    glo.publicCards.append(glo.deck.pop())
+    glo.publicCards.append(glo.deck.pop())
+    glo.publicCards.append(glo.deck.pop())
+
+def dealPlayerCard():
+    for seat in sorted(glo.onseat.keys()):
+        glo.cards[seat] = [glo.deck.pop()]
+    for seat in sorted(glo.onseat.keys()):
+        glo.cards[seat].append(glo.deck.pop())
+
 def getWinner(cards):
     score = sorted(cards.values(), reverse=True)[0]
     winner = []
@@ -73,9 +85,7 @@ def prizePool():
         for seat in glo.onseat:
             glo.onseat[seat]['bet'] -= bet if glo.onseat[seat]['bet']>0 else 0
             if glo.onseat[seat]['bet']<=0:
-                glo.cards.popItem(seat, None)
-        
-            
+                glo.cards.popItem(seat, None)     
 
 def cardHandle(cards):
     cardNum = "KA23456789TJQ"
