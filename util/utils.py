@@ -130,16 +130,16 @@ def gameResult():
                     maxCardType = cardType
         glo.cards[seat] = (maxScore, maxCards, maxCardType)
 
-def main():
-    glo.publicCards = [14,26,12,11,3]
-    glo.cards["seat1"] = [27,4]
-    glo.cards['seat2'] = [40,5]
-    glo.cards['seat3'] = [19,29]
-    glo.cards['seat4'] = [51,33]
-    glo.cards['seat5'] = [25,40]
-    print(glo.cards, glo.publicCards)
+# def main():
+#     glo.publicCards = [14,26,12,11,3]
+#     glo.cards["seat1"] = [27,4]
+#     glo.cards['seat2'] = [40,5]
+#     glo.cards['seat3'] = [19,29]
+#     glo.cards['seat4'] = [51,33]
+#     glo.cards['seat5'] = [25,40]
+#     print(glo.cards, glo.publicCards)
 
-    gameResult()
-    print(glo.cards)
+#     gameResult()
+#     print(glo.cards)
 
-main()
+# main()

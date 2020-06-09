@@ -62,10 +62,12 @@ def player_join(data):
         "userCode": data['userCode']
     })
     if(user==None):
+        socketio.emit('user_connect', {'success': False}, room=request.sid)
         print('Join failed', file=sys.stderr)
     else:
         glo.players.append(request.sid)
         socketio.emit('user_connect', {
+            'success': True,
             "name": user["name"], 
             "money": user['money']
         }, room=request.sid)
@@ -92,7 +94,7 @@ def player_ready(data):
     glo.isReady += -1 if glo.onseat[data.seat]['isReady'] else 1
     glo.onseat[data.seat]['isReady'] = not glo.onseat[data.seat]['isReady']
     if(len(glo.onseat) == glo.isReady and len(glo.onseat) != 1):
-        sa.playerReady()
+        sb = sa.playerReady()
         ut.dealPlayerCard()
         for seat in sorted(glo.cards.keys()):
             socketio.emit('cards_update', glo.cards[seat], room=glo.onseat[seat]['id'])

@@ -20,6 +20,7 @@ def playerReady():
         {"$set": {"money": sb['money']-10}}
     )
     glo.pool += 10
+    return sb
 
 def raiseBet(data):
     glo.bet = glo.bet * 2
