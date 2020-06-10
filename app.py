@@ -149,7 +149,7 @@ def client_fold(data):
     print('fold ', data.seat, file=sys.stderr)
     if(data.seat == glo.turn):
         sa.foldCard()
-        if(glo.onseat[data.seat]['nextSeat'] == glo.onseat[data.seat]['prevSeat']):
+        if(glo.onseat[data.seat]['nextSeat'] == glo.onseat[data.seat]['prevSeat'] and len(glo.cards)==1):
             print("end")
             glo.userCollection.update_one(
                 {"name": glo.onseat[glo.cards.keys()[0]]['name']}, 
