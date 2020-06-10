@@ -96,31 +96,35 @@ def player_ready(data):
     if(len(glo.onseat) == glo.isReady and len(glo.onseat) != 1):
         sb = sa.playerReady()
         ut.dealPlayerCard()
-        for seat in sorted(glo.cards.keys()):
-            socketio.emit('cards_update', glo.cards[seat], room=glo.onseat[seat]['id'])
-        ut.dealPublicCard3()
         socketio.emit('table_update', {"turn": glo.turn, "button": glo.button, "sb": sb['name'], "publicCards": glo.publicCards})
     socketio.emit('player_update', glo.onseat)
+
+def afterBetCheck():
+    if(sa.isRoundEnd()):
+        if(len(glo.publicCards)==0):
+            for seat in sorted(glo.cards.keys()):
+                socketio.emit('cards_update', {"selfCard": glo.cards[seat]}, room=glo.onseat[seat]['id'])
+            ut.dealPublicCard3()
+        if(not sa.isGameSet()):
+            ut.dealPlayerCard1()
+        else:    
+            sa.showDown()
+            socketio.emit('player_update', glo.onseat)
+            ut.gameResult()
+            socketio.emit('result_update', glo.cards)
+            ut.prizePool()
+    glo.turn = glo.onseat[glo.turn]['nextSeat']
+    socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
+    socketio.emit('player_update', glo.onseat)
+    socketio.emit('pool_update', {"pool": glo.pool})
+    socketio.emit('bet_update', {"bet": glo.bet})
 
 @socketio.on('raise')
 def client_raise(data):
     print("raise", data, request.sid, file=sys.stderr)
     if(data.seat == glo.turn and glo.onseat[data.seat]['money']+glo.onseat[data.seat]['bet']>=glo.bet*2):
         sa.raiseBet(data)
-        if(sa.isRoundEnd()):
-            if(not sa.isGameSet()):
-                ut.dealPlayerCard1()
-            else:    
-                sa.showDown()
-                socketio.emit('player_update', glo.onseat)
-                ut.gameResult()
-                socketio.emit('result_update', glo.cards)
-                ut.prizePool()
-        glo.turn = glo.onseat[glo.turn]['nextSeat']
-        socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
-        socketio.emit('player_update', glo.onseat)
-        socketio.emit('bet_update', {"bet": glo.bet})
-        socketio.emit('pool_update', {"pool": glo.pool})
+        afterBetCheck()
 
 @socketio.on('call')
 def client_call(data):
@@ -131,39 +135,14 @@ def client_call(data):
             {"$set": {"money": data['money']-glo.bet}}
         )
         glo.pool = glo.pool + glo.bet
-        if(sa.isRoundEnd()):
-            if(not sa.isGameSet()):
-                ut.dealPlayerCard1()
-            else:    
-                sa.showDown()
-                socketio.emit('player_update', glo.onseat)
-                ut.gameResult()
-                socketio.emit('result_update', glo.cards)
-                ut.prizePool()
-        glo.turn = glo.onseat[glo.turn]['nextSeat']
-        socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
-        socketio.emit('player_update', glo.onseat)
-        socketio.emit('pool_update', {"pool": glo.pool})
+        afterBetCheck()
 
 @socketio.on('allin')
 def client_allin(data):
     print("allin", request.sid, file=sys.stderr)
     if(data.seat == glo.turn):
         sa.allinBet(data)
-        if(sa.isRoundEnd()):
-            if(not sa.isGameSet()):
-                ut.dealPlayerCard1()
-            else:    
-                sa.showDown()
-                socketio.emit('player_update', glo.onseat)
-                ut.gameResult()
-                socketio.emit('result_update', glo.cards)
-                ut.prizePool()
-        glo.turn = glo.onseat[glo.turn]['nextSeat']
-        socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
-        socketio.emit('player_update', glo.onseat)
-        socketio.emit('pool_update', {"pool": glo.pool})
-        socketio.emit('bet_update', {"bet": glo.bet})
+        afterBetCheck()
 
 @socketio.on('fold')
 def client_fold(data):
@@ -176,25 +155,16 @@ def client_fold(data):
                 {"name": glo.onseat[glo.cards.keys()[0]]['name']}, 
                 {"$inc": {"money": glo.pool}}
             )
+            glo.pool = 0
         socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
         socketio.emit('player_update', glo.onseat)
+        socketio.emit('pool_update', {"pool": glo.pool})
 
 @socketio.on('check')
 def client_check(data):
     print('check ', request.sid, file=sys.stderr)
     if(data.seat == glo.turn and glo.bet == glo.onsea[data.seat]['bet']):
-        if(sa.isRoundEnd()):
-            if(not sa.isGameSet()):
-                ut.dealPlayerCard1()
-            else:
-                sa.showDown()
-                socketio.emit('player_update', glo.onseat)
-                ut.gameResult()
-                socketio.emit('result_update', glo.cards)
-                ut.prizePool()
-        glo.turn = glo.onseat[glo.turn]['nextSeat']
-        socketio.emit('table_update', {"turn": glo.turn, "publicCards": glo.publicCards})
-        socketio.emit('player_update', glo.onseat)
+        afterBetCheck()
 
 if __name__ == "__main__":
     glo.init()
