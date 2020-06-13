@@ -1,33 +1,33 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import { borderColor } from "@material-ui/system";
+import React from "react"
+import { makeStyles } from "@material-ui/core/styles"
+import Paper from "@material-ui/core/Paper"
+import Grid from "@material-ui/core/Grid"
+import { borderColor } from "@material-ui/system"
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 		width: 200,
-		borderStyle: "solid"
+		borderStyle: "solid",
 	},
 	paper: {
 		padding: theme.spacing(1),
 		textAlign: "center",
-		color: 'white',
-		backgroundColor: 'gray'
+		color: "white",
+		backgroundColor: "gray",
 	},
 	divimg: {
 		width: 35,
-		height: 60
+		height: 60,
 	},
 	imgstyle: {
 		width: "100%",
-		height: "100%"
-	}
-}));
+		height: "100%",
+	},
+}))
 
 export default function FullWidthGrid() {
-	const classes = useStyles();
+	const classes = useStyles()
 
 	return (
 		<div className={classes.root}>
@@ -62,7 +62,7 @@ export default function FullWidthGrid() {
 						/>
 					</div>
 				</Grid>
-				<Grid container item xs={6} >
+				<Grid container item xs={6}>
 					<Grid item xs={12}>
 						<Paper className={classes.paper}>cardScore </Paper>
 					</Grid>
@@ -70,7 +70,7 @@ export default function FullWidthGrid() {
 						<Paper className={classes.paper}>cardType </Paper>
 					</Grid>
 				</Grid>
-				<Grid container item xs={12}  >
+				<Grid container item xs={12}>
 					<Grid item xs={2}>
 						<div className={classes.divimg}>
 							<img
@@ -119,5 +119,5 @@ export default function FullWidthGrid() {
 				</Grid>
 			</Grid>
 		</div>
-	);
+	)
 }

@@ -1,18 +1,18 @@
-import React, { useCallback, useState, useEffect } from 'react'
-import Grid from '@material-ui/core/Grid';
-import Seat from '../Seat/seat'
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useCallback, useState, useEffect } from "react"
+import Grid from "@material-ui/core/Grid"
+import Seat from "../Seat/seat"
+import { makeStyles } from "@material-ui/core/styles"
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
 		width: "100%",
-		height: "100%"
-	}
-}));
+		height: "100%",
+	},
+}))
 
 export default function Table() {
-	const classes = useStyles();
+	const classes = useStyles()
 
 	const [pool, setPool] = useState(0)
 	const [bet, setBet] = useState(0)
@@ -23,27 +23,35 @@ export default function Table() {
 
 	return (
 		<div className={classes.root}>
-			<Grid container
+			<Grid
+				container
 				direction="column"
 				justify="space-between"
 				alignItems="center"
 			>
-				<Grid container
+				<Grid
+					container
 					direction="row"
 					justify="space-between"
 					alignItems="center"
 				>
-					<Grid container
+					<Grid
+						container
 						xs={3}
 						direction="column"
 						justify="space-between"
 						alignItems="flex-start"
 						spacing={5}
 					>
-						<Grid item xs={4}><Seat /></Grid>
-						<Grid item xs={4}><Seat /></Grid>
+						<Grid item xs={4}>
+							<Seat />
+						</Grid>
+						<Grid item xs={4}>
+							<Seat />
+						</Grid>
 					</Grid>
-					<Grid container
+					<Grid
+						container
 						xs={5}
 						direction="row"
 						justify="center"
@@ -59,26 +67,39 @@ export default function Table() {
 							<div style={textContainerStyle}>{`bet: ${bet}`}</div>
 						</Grid>
 					</Grid>
-					<Grid container
+					<Grid
+						container
 						xs={3}
 						direction="column"
 						justify="space-between"
 						alignItems="center"
 						spacing={5}
 					>
-						<Grid item xs={4}><Seat /></Grid>
-						<Grid item xs={4}><Seat /></Grid>
+						<Grid item xs={4}>
+							<Seat />
+						</Grid>
+						<Grid item xs={4}>
+							<Seat />
+						</Grid>
 					</Grid>
 				</Grid>
-				<Grid container item
+				<Grid
+					container
+					item
 					xs={8}
 					direction="row"
 					justify="space-around"
 					alignItems="flex-end"
 				>
-					<Grid item><Seat /></Grid>
-					<Grid item><Seat /></Grid>
-					<Grid item><Seat /></Grid>
+					<Grid item>
+						<Seat />
+					</Grid>
+					<Grid item>
+						<Seat />
+					</Grid>
+					<Grid item>
+						<Seat />
+					</Grid>
 				</Grid>
 			</Grid>
 		</div>
