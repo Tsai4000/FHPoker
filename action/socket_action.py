@@ -11,28 +11,27 @@ def playerReady():
     glo.rounds += 1
 
     sb = glo.onseat[glo.onseat[glo.button]['nextSeat']]
-    glo.onseat[glo.onseat[glo.button]['nextSeat']]['money'] -= 10
+    glo.onseat[glo.onseat[glo.button]['nextSeat']]['money'] -= glo.bb
     glo.startPlayer = glo.onseat[sb['nexzSeat']]
     glo.startPlayer = glo.turn
     glo.userCollection.update_one(
         {"name": sb["name"]},
-        {"$set": {"money": sb['money']-10}}
+        {"$set": {"money": sb['money']-glo.bb}}
     )
-    glo.pool += 10
+    glo.pool += glo.bb
     return sb
 
 
 def raiseBet(data):
-    glo.bet = glo.bet * 2
+    glo.bet = data.bet
+    player = glo.onseat[data.seat]
+    player['money'] = player['money']-(glo.bet+player['bet'])
+    glo.pool = glo.pool + glo.bet - player['bet']
+    player['bet'] = glo.bet
     glo.userCollection.update_one(
-        {"name": glo.onseat[data.seat]['name']},
-        {"$set": {"money": glo.onseat[data.seat]
-                  ['money']-(glo.bet+glo.onseat[data.seat]['bet'])}}
+        {"name": player['name']},
+        {"$inc": {"money": player['money']}}
     )
-    glo.pool = glo.pool + glo.bet - glo.onseat[data.seat]['bet']
-    glo.onseat[data.seat]['bet'] = glo.bet
-    glo.onseat[data.seat]['money'] = glo.onseat[data.seat]['money'] - \
-        (glo.bet+glo.onseat[data.seat]['bet'])
 
 
 def allinBet(data):

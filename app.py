@@ -36,6 +36,24 @@ def upload():
     return make_response(jsonify(user), 200)
 
 
+@app.route('/login', methods=['POST'])
+def login():
+    if not request.json:
+        abort(400)
+    req = request.get_json()
+    user = glo.userCollection.find_one(
+        {'name': req['name'], "userCode": req['userCode']})
+    if(not user):
+        make_response(jsonify({
+            "message": 'Login failed'
+        }), 400)
+    else:
+        return make_response(jsonify({
+            "name": user['name'],
+            "money": user['money']
+        }), 200)
+
+
 @socketio.on('disconnect')
 def client_disconnect():
     glo.clients.remove(request.sid)
@@ -129,7 +147,7 @@ def afterBetCheck():
 @socketio.on('raise')
 def client_raise(data):
     print("raise", data, request.sid, file=sys.stderr)
-    if(data.seat == glo.turn and glo.onseat[data.seat]['money']+glo.onseat[data.seat]['bet'] >= glo.bet*2):
+    if(data.seat == glo.turn and glo.onseat[data.seat]['money']+glo.onseat[data.seat]['bet'] >= glo.bet+glo.bb):
         sa.raiseBet(data)
         afterBetCheck()
 
