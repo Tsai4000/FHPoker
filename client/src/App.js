@@ -3,6 +3,7 @@ import logo from "./logo.svg"
 import "./App.css"
 import io from "socket.io-client"
 import Table from "./container/Table/table"
+import Login from './container/Login/login'
 
 function App() {
   const testSocket = () => {
@@ -14,7 +15,7 @@ function App() {
     <div>
       <h1>POKER</h1>
       <Table />
-      <button onClick={testSocket}>connect</button>
+      <Login />
     </div>
   )
 }

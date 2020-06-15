@@ -33,16 +33,11 @@ const useStyles = makeStyles((theme) => ({
 export default function Seat(props) {
 	const classes = useStyles()
 
-	const [card1, setCard1] = useState(0)
-	const [card2, setCard2] = useState(0)
-	const [name, setName] = useState('default')
+	const [card1, setCard1] = useState(-1)
+	const [card2, setCard2] = useState(-1)
+	const [name, setName] = useState('empty')
 	const [money, setMoney] = useState(0)
-	const [status, setStatus] = useState('default')
-
-	const tryClick = useCallback(() => {
-		setCard1(card1 + 1)
-		setCard2(card2 + 1)
-	}, [card1, card2, setCard1, setCard2])
+	const [status, setStatus] = useState('empty')
 
 	return (
 		<div className={classes.root}>

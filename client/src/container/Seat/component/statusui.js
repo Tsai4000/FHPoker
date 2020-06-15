@@ -12,7 +12,8 @@ const useStyle = makeStyles((theme) => ({
   },
   status: {
     width: '100%',
-    height: '100%'
+    height: '100%',
+    backgroundColor: '#bdbdbd'
   }
 }))
 
@@ -20,10 +21,40 @@ const useStyle = makeStyles((theme) => ({
 export default function StatusUI(props) {
   const classes = useStyle()
 
+  const [status, setStatus] = useState(props.status)
+
+  const mouseOver = useCallback((e) => {
+    if (status == '') {
+      e.target.style.backgroundColor = 'black'
+      setStatus('Ready?')
+    } else if (status == 'empty') {
+      e.target.style.backgroundColor = 'black'
+      setStatus('Sit?')
+    }
+  }, [status, setStatus])
+  const mouseOut = useCallback((e) => {
+    if (status == 'Ready?') {
+      e.target.style.backgroundColor = '#bdbdbd'
+      setStatus('')
+    } else if (status == 'Sit?') {
+      e.target.style.backgroundColor = '#bdbdbd'
+      setStatus('empty')
+    }
+  }, [status, setStatus])
+
+  const click = useCallback((e) => {
+    if (status == 'Sit?') {
+      e.target.style.backgroundColor = '#bdbdbd'
+      setStatus('')
+    } else if (status == 'Ready?') {
+      e.target.style.backgroundColor = '#bdbdbd'
+      setStatus('Waiting')
+    }
+  }, [status, setStatus])
 
   return (
     <div className={classes.root}>
-      <Avatar className={classes.status}>{props.status}</Avatar>
+      <Avatar className={classes.status} onMouseOver={mouseOver} onMouseOut={mouseOut} onClick={click}>{status}</Avatar>
     </div>
   )
 }
