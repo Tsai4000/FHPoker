@@ -139,7 +139,7 @@ def gameResult():
                 (score, cards, cardType) = cardScore(cards)
                 if(score >= maxScore):
                     maxScore = score
-                    maxCards = cards
+                    maxCards = hand[:i]+hand[i+1:j]+hand[j+1:]
                     maxCardType = cardType
         glo.cards[seat] = (maxScore, maxCards, maxCardType)
 
