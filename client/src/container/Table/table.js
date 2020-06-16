@@ -3,8 +3,8 @@ import Grid from "@material-ui/core/Grid"
 import Seat from "../Seat/seat"
 import { makeStyles } from "@material-ui/core/styles"
 import Background from './img/canvas.png'
-import Card from '../Card/card'
 import PublicCards from './component/publicCards'
+import { useDispatch, useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,8 +16,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Table() {
+export default function Table(props) {
   const classes = useStyles()
+  const playerss = useSelector(state => state.seats)
 
   const [pool, setPool] = useState(0)
   const [bet, setBet] = useState(0)
@@ -26,6 +27,7 @@ export default function Table() {
 
   const textContainerStyle = { fontSize: 20, textShadow: '0px 0px 3px  #ffffff', textAlign: "center" }
   const seat = ['seat0', 'seat1', 'seat2', 'seat3', 'seat4', 'seat5', 'seat6', 'seat7']
+
   return (
     <div className={classes.root}>
       <Grid
@@ -81,10 +83,10 @@ export default function Table() {
             spacing={5}
           >
             <Grid item xs={4}>
-              <Seat id={seat[7]} player={players[seat[3]]} />
+              <Seat id={seat[7]} player={players[seat[7]]} />
             </Grid>
             <Grid item xs={4}>
-              <Seat id={seat[6]} player={players[seat[4]]} />
+              <Seat id={seat[6]} player={players[seat[6]]} />
             </Grid>
           </Grid>
         </Grid>
@@ -97,13 +99,13 @@ export default function Table() {
           alignItems="flex-end"
         >
           <Grid item>
-            <Seat id={seat[3]} player={players[seat[5]]} />
+            <Seat id={seat[3]} player={players[seat[3]]} />
           </Grid>
           <Grid item>
-            <Seat id={seat[4]} player={players[seat[6]]} />
+            <Seat id={seat[4]} player={playerss == undefined ? players[seat[4]] : playerss[seat[4]]} socket={props.socket} />
           </Grid>
           <Grid item>
-            <Seat id={seat[5]} player={players[seat[7]]} />
+            <Seat id={seat[5]} player={players[seat[5]]} />
           </Grid>
         </Grid>
       </Grid>

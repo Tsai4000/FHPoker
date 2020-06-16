@@ -42,11 +42,11 @@ export default function Seat(props) {
 	return (
 		<div className={classes.root}>
 			<Grid container spacing={0} justify="space-between">
-				<Card number={card1} left={0}></Card>
+				<Card number={props.player && props.player.hand[0]} left={0}></Card>
 				<Card number={card2} left={60}></Card>
 				<NameUI name={name}></NameUI>
 				<MoneyUI money={money}></MoneyUI>
-				<StatusUI status={status}></StatusUI>
+				<StatusUI status={status} socket={props.socket}></StatusUI>
 			</Grid>
 		</div>
 	)

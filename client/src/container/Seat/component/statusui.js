@@ -46,6 +46,7 @@ export default function StatusUI(props) {
     if (status == 'Sit?') {
       e.target.style.backgroundColor = '#bdbdbd'
       setStatus('')
+      props.socket.sitDown({ seat: 'seat4', name: 'test' })
     } else if (status == 'Ready?') {
       e.target.style.backgroundColor = '#bdbdbd'
       setStatus('Waiting')
