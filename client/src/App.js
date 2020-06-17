@@ -3,6 +3,7 @@ import "./App.css"
 import io from "socket.io-client"
 import Table from "./container/Table/table"
 import Login from './container/Login/login'
+import ActionButtons from './container/Actions/actionButtons'
 import { useSelector, useDispatch } from 'react-redux';
 import { setSeats } from './reducer/seats/seatsAction'
 import { setName, setMoney, setSitOn, setIsReady } from './reducer/user/userAction'
@@ -78,6 +79,7 @@ function SocketApp() {
       {!name ? null : <div>{`name: ${name}`}</div>}
       {!money ? null : <div>{`money: ${money}`}</div>}
       {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
+      <ActionButtons />
     </div>
   )
 }
