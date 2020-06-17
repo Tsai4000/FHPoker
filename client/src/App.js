@@ -4,34 +4,35 @@ import io from "socket.io-client"
 import Table from "./container/Table/table"
 import Login from './container/Login/login'
 import { useSelector, useDispatch } from 'react-redux';
-import { setSeats, getSeats } from './reducer/seats/seatsAction'
+import { setSeats } from './reducer/seats/seatsAction'
+import { setName, setMoney, setSitOn, setIsReady } from './reducer/user/userAction'
 
 function SocketApp() {
   const dispatch = useDispatch()
-  // const seats = useSelector(state => state.seats)
-
+  const { name, money, sitOn } = useSelector(state => ({
+    name: state.user.name,
+    money: state.user.money,
+    sitOn: state.user.sitOn
+  }))
 
   const [socket, setSocket] = useState(null)
-  // const [pool, setPool] = useState(0)
-  // const [bet, setBet] = useState(0)
-  // const [seats, setSeats] = useState({})
-  // const [bb, setBB] = useState(0)
-  // const [button, setButton] = useState('')
-  // const [startPlayer, setStartPlayer] = useState('')
-  // const [turn, setTurn] = useState('')
-  // const [publicCards, setPublicCards] = useState([])
-  const [name, setName] = useState('')
-  const [money, setMoney] = useState(null)
+
+  const player_update = useCallback((msg) => {
+    console.log('player_update')
+    Object.keys(msg).forEach((seat) => {
+      if (msg[seat].name === name) {
+        dispatch(setSitOn(seat))
+        dispatch(setIsReady(msg[seat].isReady))
+      }
+    })
+    dispatch(setSeats(msg))
+  }, [dispatch, name])
 
   useEffect(() => {
     if (socket != null) {
       socket.on('player_update', player_update)
     }
-  }, [socket])
-
-  const player_update = useCallback((msg) => {
-    dispatch(setSeats(msg))
-  }, [dispatch])
+  }, [socket, player_update])
 
   const login = useCallback((name, userCode) => {
     fetch(`http://${document.domain}:5000/login`, {
@@ -53,25 +54,30 @@ function SocketApp() {
       }
     }).then((body) => {
       if (body) {
-        setName(body.name)
-        setMoney(body.money)
+        dispatch(setName(body.name))
+        dispatch(setMoney(body.money))
       }
     })
-  }, [setSocket, setName, setMoney])
+  }, [setSocket, dispatch])
 
   const sitDown = useCallback((data) => {
     socket.emit('sit', data)
   }, [socket])
 
-  const funcs = { sitDown: sitDown }
+  const ready = useCallback((data) => {
+    socket.emit('click_ready', data)
+  }, [socket])
+
+  const funcs = { sitDown, ready }
 
   return (
     <div>
       <h1>POKER</h1>
       <Table socket={funcs} />
-      {name == '' && money == null ? <Login login={login} /> : null}
-      {name == '' ? null : <div>{`name: ${name}`}</div>}
-      {money == null ? null : <div>{`money: ${money}`}</div>}
+      {!name && !money ? <Login login={login} /> : null}
+      {!name ? null : <div>{`name: ${name}`}</div>}
+      {!money ? null : <div>{`money: ${money}`}</div>}
+      {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
     </div>
   )
 }

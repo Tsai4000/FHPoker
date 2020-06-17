@@ -1,6 +1,10 @@
 import { combineReducers } from 'redux'
-import seatReducer from './seats/seatsReducer'
+import seatsReducer from './seats/seatsReducer'
+import tableReducer from './table/tableReducer'
+import userReducer from './user/userReducer'
 
 export default combineReducers({
-  seatReducer
+  seats: seatsReducer,
+  table: tableReducer,
+  user: userReducer
 })

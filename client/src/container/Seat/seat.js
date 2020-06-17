@@ -33,20 +33,16 @@ const useStyles = makeStyles((theme) => ({
 export default function Seat(props) {
 	const classes = useStyles()
 
-	const [card1, setCard1] = useState(-1)
-	const [card2, setCard2] = useState(-1)
-	const [name, setName] = useState('empty')
-	const [money, setMoney] = useState(0)
 	const [status, setStatus] = useState('empty')
 
 	return (
 		<div className={classes.root}>
 			<Grid container spacing={0} justify="space-between">
 				<Card number={props.player && props.player.hand[0]} left={0}></Card>
-				<Card number={card2} left={60}></Card>
-				<NameUI name={name}></NameUI>
-				<MoneyUI money={money}></MoneyUI>
-				<StatusUI status={status} socket={props.socket}></StatusUI>
+				<Card number={props.player && props.player.hand[1]} left={60}></Card>
+				<NameUI name={props.player && props.player.name}></NameUI>
+				<MoneyUI money={props.player && props.player.money}></MoneyUI>
+				<StatusUI player={props.player} id={props.id} socket={props.socket}></StatusUI>
 			</Grid>
 		</div>
 	)

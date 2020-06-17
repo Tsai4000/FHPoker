@@ -18,15 +18,19 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Table(props) {
   const classes = useStyles()
-  const playerss = useSelector(state => state.seats)
-
-  const [pool, setPool] = useState(0)
-  const [bet, setBet] = useState(0)
-  const [publicCards, setPublicCards] = useState([])
-  const [players, setPlayers] = useState({})
+  const { seats } = useSelector(state => ({ seats: state.seats.seats }))
+  const { pool, bet, publicCards } = useSelector(state => ({
+    pool: state.table.pool,
+    bet: state.table.bet,
+    publicCards: state.table.publicCards
+  }))
 
   const textContainerStyle = { fontSize: 20, textShadow: '0px 0px 3px  #ffffff', textAlign: "center" }
-  const seat = ['seat0', 'seat1', 'seat2', 'seat3', 'seat4', 'seat5', 'seat6', 'seat7']
+  const seatList = ['seat0', 'seat1', 'seat2', 'seat3', 'seat4', 'seat5', 'seat6', 'seat7']
+
+  const getPlayerBySeat = useCallback((seat) => {
+    return seats.hasOwnProperty(seat) ? seats[seat] : null
+  }, [seats])
 
   return (
     <div className={classes.root}>
@@ -51,10 +55,10 @@ export default function Table(props) {
             spacing={5}
           >
             <Grid item xs={4}>
-              <Seat id={seat[1]} player={players[seat[1]]} />
+              <Seat id={seatList[1]} player={getPlayerBySeat(seatList[1])} socket={props.socket} />
             </Grid>
             <Grid item xs={4}>
-              <Seat id={seat[2]} player={players[seat[2]]} />
+              <Seat id={seatList[2]} player={getPlayerBySeat(seatList[2])} socket={props.socket} />
             </Grid>
           </Grid>
           <Grid
@@ -83,10 +87,10 @@ export default function Table(props) {
             spacing={5}
           >
             <Grid item xs={4}>
-              <Seat id={seat[7]} player={players[seat[7]]} />
+              <Seat id={seatList[7]} player={getPlayerBySeat(seatList[7])} socket={props.socket} />
             </Grid>
             <Grid item xs={4}>
-              <Seat id={seat[6]} player={players[seat[6]]} />
+              <Seat id={seatList[6]} player={getPlayerBySeat(seatList[6])} socket={props.socket} />
             </Grid>
           </Grid>
         </Grid>
@@ -99,13 +103,13 @@ export default function Table(props) {
           alignItems="flex-end"
         >
           <Grid item>
-            <Seat id={seat[3]} player={players[seat[3]]} />
+            <Seat id={seatList[3]} player={getPlayerBySeat(seatList[3])} socket={props.socket} />
           </Grid>
           <Grid item>
-            <Seat id={seat[4]} player={playerss == undefined ? players[seat[4]] : playerss[seat[4]]} socket={props.socket} />
+            <Seat id={seatList[4]} player={getPlayerBySeat(seatList[4])} socket={props.socket} />
           </Grid>
           <Grid item>
-            <Seat id={seat[5]} player={players[seat[5]]} />
+            <Seat id={seatList[5]} player={getPlayerBySeat(seatList[5])} socket={props.socket} />
           </Grid>
         </Grid>
       </Grid>
