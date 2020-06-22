@@ -148,10 +148,8 @@ def afterBetCheck():
             ut.prizePool()
     glo.turn = glo.onseat[glo.turn]['nextSeat']
     socketio.emit('table_update', {
-                  "turn": glo.turn, "publicCards": glo.publicCards})
+                  "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool, "bet": glo.bet})
     socketio.emit('player_update', glo.onseat)
-    socketio.emit('pool_update', {"pool": glo.pool})
-    socketio.emit('bet_update', {"bet": glo.bet})
 
 
 @socketio.on('raise')
@@ -195,9 +193,8 @@ def client_fold(data):
             )
             glo.pool = 0
         socketio.emit('table_update', {
-                      "turn": glo.turn, "publicCards": glo.publicCards})
+                      "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool})
         socketio.emit('player_update', glo.onseat)
-        socketio.emit('pool_update', {"pool": glo.pool})
 
 
 @socketio.on('check')
