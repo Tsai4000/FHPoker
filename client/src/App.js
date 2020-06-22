@@ -69,7 +69,11 @@ function SocketApp() {
     socket.emit('click_ready', data)
   }, [socket])
 
-  const funcs = { sitDown, ready }
+  const emit = useCallback((type, data) => {
+    socket.emit(type, data)
+  }, [socket])
+
+  const funcs = { sitDown, ready, emit }
 
   return (
     <div>
@@ -79,7 +83,7 @@ function SocketApp() {
       {!name ? null : <div>{`name: ${name}`}</div>}
       {!money ? null : <div>{`money: ${money}`}</div>}
       {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
-      <ActionButtons />
+      {name && money ? <ActionButtons socket={funcs} /> : null}
     </div>
   )
 }

@@ -2,6 +2,7 @@ export const SET_POOL = 'SET_POOL'
 export const SET_BET = 'SET_BET'
 export const SET_BB = 'SET_BB'
 export const SET_BUTTON = 'SET_BUTTON'
+export const SET_SELF_BET = 'SET_SELF_BET'
 export const SET_START_PLAYER = 'SET_START_PLAYER'
 export const SET_TURN = 'SET_TURN'
 export const SET_PUBLIC_CARDS = 'SET_PUBLIC_CARDS'
@@ -17,6 +18,9 @@ export function setBB(bb) {
 }
 export function setButton(button) {
   return { type: SET_BUTTON, button }
+}
+export function setSelfBet(selfBet) {
+  return { type: SET_SELF_BET, selfBet }
 }
 export function setStartPlayer(startPlayer) {
   return { type: SET_START_PLAYER, startPlayer }
