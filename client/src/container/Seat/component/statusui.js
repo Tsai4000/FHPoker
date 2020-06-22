@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Avatar from '@material-ui/core/Avatar';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyle = makeStyles((theme) => ({
   root: {
@@ -21,24 +21,23 @@ const useStyle = makeStyles((theme) => ({
 
 export default function StatusUI(props) {
   const classes = useStyle()
-  const { name, isReady, sitOn } = useSelector(state => ({
+  const dispatch = useDispatch()
+  const { name, isReady, sitOn } = useSelector((state) => ({
     name: state.user.name,
     isReady: state.user.isReady,
     sitOn: state.user.sitOn
   }))
   const { seats } = useSelector(state => ({ seats: state.seats.seats }))
 
-  const [status, setStatus] = useState('empty')
+  const [status, setStatus] = useState(props.player ? props.player.isReady ? 'Waiting' : 'Ready?' : 'empty')
 
   useEffect(() => {
-    if (sitOn && sitOn != props.id) {
-      if (props.player) {
-        setStatus(props.player.isReady === false ? 'Ready?' : 'ss')
-      } else {
-        setStatus('empty')
-      }
+    if (props.player) {
+      setStatus(props.player.isReady === false ? 'Ready?' : 'Waiting')
+    } else {
+      setStatus('empty')
     }
-  }, [seats, sitOn])
+  }, [seats])
 
   const mouseOver = useCallback((e) => {
     if (status === 'Ready?') {
@@ -77,7 +76,7 @@ export default function StatusUI(props) {
   return (
     <div className={classes.root}>
       <Avatar className={classes.status} onMouseOver={mouseOver} onMouseOut={mouseOut} onClick={click}>
-        {!props.player ? status : props.player.isReady ? 'Waiting' : status}
+        {status}
       </Avatar>
     </div>
   )

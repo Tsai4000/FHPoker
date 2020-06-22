@@ -8,14 +8,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setSeats } from './reducer/seats/seatsAction'
 import { setName, setMoney, setSitOn, setIsReady } from './reducer/user/userAction'
 import { setPool, setButton, setBet, setPublicCards, setTurn } from './reducer/table/tableAction'
-import { List } from "@material-ui/core";
 
 function SocketApp() {
   const dispatch = useDispatch()
   const { seats } = useSelector(state => ({
     seats: state.seats.seats
   }))
-  const { name, money, sitOn } = useSelector(state => ({
+  const { name, money, sitOn } = useSelector((state) => ({
     name: state.user.name,
     money: state.user.money,
     sitOn: state.user.sitOn
@@ -40,14 +39,19 @@ function SocketApp() {
       switch (key) {
         case 'turn':
           dispatch(setTurn(msg[key]))
+          break
         case 'button':
           dispatch(setButton(msg[key]))
+          break
         case 'publicCards':
           dispatch(setPublicCards(msg[key]))
+          break
         case 'pool':
           dispatch(setPool(msg[key]))
+          break
         case 'bet':
           dispatch(setBet(msg[key]))
+          break
         default:
           return null
       }
@@ -69,16 +73,24 @@ function SocketApp() {
   useEffect(() => {
     if (socket != null) {
       socket.on('player_update', player_update)
+    }
+  }, [socket, player_update])
+  useEffect(() => {
+    if (socket != null) {
       socket.on('table_update', table_update)
+    }
+  }, [socket, table_update])
+  useEffect(() => {
+    if (socket != null) {
       socket.on('cards_update', cards_update)
     }
-  }, [socket])
+  }, [socket, cards_update])
 
-  const login = useCallback((name, userCode) => {
+  const login = useCallback((username, userCode) => {
     fetch(`http://${document.domain}:5000/login`, {
       method: 'POST',
       body: JSON.stringify({
-        name: name,
+        name: username,
         userCode: userCode
       }),
       headers: {
