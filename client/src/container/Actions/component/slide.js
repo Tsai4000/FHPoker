@@ -27,6 +27,7 @@ export default function InputSlider(props) {
   useEffect(() => {
     dispatch(setSelfBet(value))
   }, [value])
+
   const handleSliderChange = (event, newValue) => {
     setValue(newValue)
   }
@@ -60,7 +61,7 @@ export default function InputSlider(props) {
             max={money}
             value={typeof value === 'number' ? value : 0}
             onChange={handleSliderChange}
-            aria-labelledby="linear-slider"
+            aria-labelledby="input-slider"
           />
         </Grid>
         <Grid item>

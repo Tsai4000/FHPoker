@@ -25,7 +25,7 @@ export default function Table(props) {
     publicCards: state.table.publicCards
   }))
 
-  const textContainerStyle = { fontSize: 20, textShadow: '0px 0px 3px  #ffffff', textAlign: "center" }
+  const textContainerStyle = { fontSize: 35, textShadow: '0px 0px 3px  #ffffff', textAlign: "center" }
   const seatList = ['seat0', 'seat1', 'seat2', 'seat3', 'seat4', 'seat5', 'seat6', 'seat7']
 
   const getPlayerBySeat = useCallback((seat) => {
