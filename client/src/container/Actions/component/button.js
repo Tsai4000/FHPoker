@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 const useStyle = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
-    width: 300
+    width: 200
   }
 }))
 
@@ -44,7 +44,7 @@ export default function ActionButtons(props) {
         color="primary"
         onClick={handleClick(props.type)}
       >
-        {props.type === 'rasie' ? `${props.type} $${selfBet}` : props.type}
+        {props.type === 'raise' ? `${props.type} $${selfBet}` : props.type}
       </Button>
     </>
   )
