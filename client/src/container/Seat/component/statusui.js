@@ -63,15 +63,15 @@ export default function StatusUI(props) {
       e.target.style.backgroundColor = '#bdbdbd'
       setStatus('Ready?')
       props.socket.sitDown({ seat: props.id, name: name })
-    } else if (status === 'Ready' && !isReady) {
+    } else if (status === 'Ready' && sitOn === props.id && !isReady) {
       e.target.style.backgroundColor = '#bdbdbd'
       setStatus('Waiting')
       props.socket.ready({ seat: props.id })
-    } else if (status === 'Waiting' && isReady) {
+    } else if (status === 'Waiting' && sitOn === props.id && isReady) {
       setStatus('Ready')
       props.socket.ready({ seat: props.id })
     }
-  }, [status, setStatus, props, name, isReady])
+  }, [status, setStatus, props, name, isReady, sitOn])
 
   return (
     <div className={classes.root}>
