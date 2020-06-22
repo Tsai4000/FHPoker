@@ -7,9 +7,14 @@ import ActionButtons from './container/Actions/actionButtons'
 import { useSelector, useDispatch } from 'react-redux';
 import { setSeats } from './reducer/seats/seatsAction'
 import { setName, setMoney, setSitOn, setIsReady } from './reducer/user/userAction'
+import { setPool, setButton, setBet, setPublicCards, setTurn } from './reducer/table/tableAction'
+import { List } from "@material-ui/core";
 
 function SocketApp() {
   const dispatch = useDispatch()
+  const { seats } = useSelector(state => ({
+    seats: state.seats.seats
+  }))
   const { name, money, sitOn } = useSelector(state => ({
     name: state.user.name,
     money: state.user.money,
@@ -29,11 +34,45 @@ function SocketApp() {
     dispatch(setSeats(msg))
   }, [dispatch, name])
 
+  const table_update = useCallback((msg) => {
+    console.log('table_update')
+    Object.keys(msg).forEach((key) => {
+      switch (key) {
+        case 'turn':
+          dispatch(setTurn(msg[key]))
+        case 'button':
+          dispatch(setButton(msg[key]))
+        case 'publicCards':
+          dispatch(setPublicCards(msg[key]))
+        case 'pool':
+          dispatch(setPool(msg[key]))
+        case 'bet':
+          dispatch(setBet(msg[key]))
+        default:
+          return null
+      }
+    })
+    dispatch(setSeats(msg))
+  }, [dispatch])
+
+  const cards_update = useCallback((msg) => {
+    console.log('cards_update')
+    Object.keys(seats).forEach((key) => {
+      if (seats[key].name === name) {
+        const handupdate = seats
+        handupdate[key].hand = msg.selfCard
+        dispatch(setSeats(handupdate))
+      }
+    })
+  }, [dispatch, seats, name])
+
   useEffect(() => {
     if (socket != null) {
       socket.on('player_update', player_update)
+      socket.on('table_update', table_update)
+      socket.on('cards_update', cards_update)
     }
-  }, [socket, player_update])
+  }, [socket])
 
   const login = useCallback((name, userCode) => {
     fetch(`http://${document.domain}:5000/login`, {
