@@ -13,13 +13,16 @@ const useStyle = makeStyles((theme) => ({
 export default function ActionButtons(props) {
   const classes = useStyle()
   const { selfBet } = useSelector((state) => ({ selfBet: state.table.selfBet }))
-  const { sitOn, money } = useSelector((state) => ({ sitOn: state.user.sitOn, moeny: state.user.money }))
+  const { sitOn, money } = useSelector((state) => ({ sitOn: state.user.sitOn, money: state.user.money }))
 
   const handleClick = useCallback(() => {
-    props.type === 'raise' && selfBet >= money
-      ? props.socket.emit(props.type, { seat: sitOn, bet: selfBet })
-      : props.socket.emit(props.type, { seat: sitOn })
-  }, [])
+    console.log(selfBet, money)
+    if (props.type === 'raise' && selfBet <= money) {
+      props.socket.emit(props.type, { seat: sitOn, bet: selfBet })
+    } else {
+      props.socket.emit(props.type, { seat: sitOn })
+    }
+  }, [money, selfBet, sitOn])
 
   return (
     <>

@@ -14,6 +14,9 @@ function SocketApp() {
   const { seats } = useSelector(state => ({
     seats: state.seats.seats
   }))
+  const { turn } = useSelector(state => ({
+    turn: state.table.turn
+  }))
   const { name, money, sitOn } = useSelector((state) => ({
     name: state.user.name,
     money: state.user.money,
@@ -26,8 +29,10 @@ function SocketApp() {
     console.log('player_update')
     Object.keys(msg).forEach((seat) => {
       if (msg[seat].name === name) {
+        console.log(name, msg[seat], msg[seat].isReady, msg[seat].money)
         dispatch(setSitOn(seat))
         dispatch(setIsReady(msg[seat].isReady))
+        dispatch(setMoney(msg[seat].money))
       }
     })
     dispatch(setSeats(msg))
@@ -65,6 +70,7 @@ function SocketApp() {
       if (seats[key].name === name) {
         const handupdate = seats
         handupdate[key].hand = msg.selfCard
+        console.log(handupdate)
         dispatch(setSeats(handupdate))
       }
     })
@@ -134,6 +140,7 @@ function SocketApp() {
       {!name ? null : <div>{`name: ${name}`}</div>}
       {!money ? null : <div>{`money: ${money}`}</div>}
       {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
+      {!turn ? null : <div>{`turn: ${turn}`}</div>}
       {name && money && sitOn ? <ActionButtons socket={funcs} /> : null}
     </div>
   )
