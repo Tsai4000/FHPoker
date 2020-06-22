@@ -107,7 +107,8 @@ def player_sit(data):
             'hand': [-1, -1],
             "isReady": False,
             "isFold": False,
-            "id": request.sid
+            "id": request.sid,
+            "isAllin": False
         }
     elif(data['seat'] not in glo.onseat and data['name'] in seatList): 
         for seat in glo.onseat.copy():
@@ -127,8 +128,15 @@ def player_ready(data):
         sb = sa.playerReady()
         ut.dealPlayerCard()
         socketio.emit('table_update', {
-                      "turn": glo.turn, "button": glo.button, "sb": sb['name'], "publicCards": glo.publicCards})
+            "turn": glo.turn, 
+            "button": glo.button, 
+            "sb": sb['name'], 
+            "publicCards": glo.publicCards, 
+            'pool': glo.pool, 
+            'bet': glo.bet})
     socketio.emit('player_update', glo.onseat)
+    print('turn:'+glo.turn, glo.bet, glo.pool, file=sys.stderr)
+
 
 
 def afterBetCheck():
@@ -138,6 +146,7 @@ def afterBetCheck():
                 socketio.emit('cards_update', {
                               "selfCard": glo.cards[seat]}, room=glo.onseat[seat]['id'])
             ut.dealPublicCard3()
+            ## TODO:無法正確發牌給個人與公排
         if(not sa.isGameSet()):
             ut.dealPublicCard1()
         else:
@@ -150,40 +159,42 @@ def afterBetCheck():
     socketio.emit('table_update', {
                   "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool, "bet": glo.bet})
     socketio.emit('player_update', glo.onseat)
+    print('turn:'+glo.turn, glo.bet, glo.pool, file=sys.stderr)
+
 
 
 @socketio.on('raise')
 def client_raise(data):
-    print("raise", data, request.sid, file=sys.stderr)
     if(data['seat'] == glo.turn and glo.onseat[data['seat']]['money']+glo.onseat[data['seat']]['bet'] >= glo.bet+glo.bb):
+        print("raise", data, request.sid, file=sys.stderr)
         sa.raiseBet(data)
         afterBetCheck()
 
 
 @socketio.on('call')
 def client_call(data):
-    print("call", request.sid, file=sys.stderr)
     if(data['seat'] == glo.turn and glo.onseat[data['seat']]['money']+glo.onseat[data['seat']]['bet'] >= glo.bet):
+        print("call", request.sid, file=sys.stderr)
         glo.userCollection.update_one(
-            {"name": data['name']},
-            {"$set": {"money": data['money']-glo.bet}}
+            {"name": glo.onseat[data['seat']]['name']},
+            {"$inc": {"money": -(glo.bet-glo.onseat[data['seat']]['bet'])}}
         )
-        glo.pool = glo.pool + glo.bet
+        glo.pool = glo.pool + (glo.bet-glo.onseat[data['seat']]['bet'])
         afterBetCheck()
 
 
 @socketio.on('allin')
 def client_allin(data):
-    print("allin", request.sid, file=sys.stderr)
     if(data['seat'] == glo.turn):
+        print("allin", request.sid, file=sys.stderr)
         sa.allinBet(data)
         afterBetCheck()
 
 
 @socketio.on('fold')
 def client_fold(data):
-    print('fold ', data['seat'], file=sys.stderr)
     if(data['seat'] == glo.turn):
+        print('fold ', data['seat'], file=sys.stderr)
         sa.foldCard(data)
         if(glo.onseat[data['seat']]['nextSeat'] == glo.onseat[data['seat']]['prevSeat'] and len(glo.cards) == 1):
             print("end")
@@ -199,8 +210,8 @@ def client_fold(data):
 
 @socketio.on('check')
 def client_check(data):
-    print('check ', request.sid, file=sys.stderr)
     if(data['seat'] == glo.turn and glo.bet == glo.onseat[data['seat']]['bet']):
+        print('check ', request.sid, file=sys.stderr)
         afterBetCheck()
 
 

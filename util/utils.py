@@ -2,6 +2,7 @@ import util.globalV as glo
 import random
 import pymongo
 import os
+import sys
 
 COEF = {'37': 97425,
         '34': 28239,
@@ -67,6 +68,7 @@ def dealPlayerCard():
         glo.cards[seat] = [glo.deck.pop()]
     for seat in sorted(glo.onseat.keys()):
         glo.cards[seat].append(glo.deck.pop())
+    print(glo.cards, file=sys.stderr)
 
 
 def getWinner(cards):

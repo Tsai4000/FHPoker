@@ -12,13 +12,15 @@ def playerReady():
 
     sb = glo.onseat[glo.onseat[glo.button]['nextSeat']]
     glo.onseat[glo.onseat[glo.button]['nextSeat']]['money'] -= glo.bb
-    glo.startPlayer = glo.onseat[sb['nexzSeat']]
-    glo.startPlayer = glo.turn
+    glo.startPlayer = sb['nextSeat']
+    glo.turn = glo.startPlayer
     glo.userCollection.update_one(
         {"name": sb["name"]},
         {"$set": {"money": sb['money']-glo.bb}}
     )
     glo.pool += glo.bb
+    glo.bet = glo.bb
+    print('gamestart', glo.onseat, file=sys.stderr)
     return sb
 
 
