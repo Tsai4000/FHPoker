@@ -83,7 +83,7 @@ function SocketApp() {
       {!name ? null : <div>{`name: ${name}`}</div>}
       {!money ? null : <div>{`money: ${money}`}</div>}
       {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
-      {name && money ? <ActionButtons socket={funcs} /> : null}
+      {name && money && sitOn ? <ActionButtons socket={funcs} /> : null}
     </div>
   )
 }
