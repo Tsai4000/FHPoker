@@ -121,8 +121,10 @@ function SocketApp() {
   }, [socket])
 
   const emit = useCallback((type, data) => {
-    socket.emit(type, data)
-  }, [socket])
+    if (turn === data.seat) {
+      socket.emit(type, data)
+    }
+  }, [socket, turn])
 
   const funcs = { sitDown, ready, emit }
 

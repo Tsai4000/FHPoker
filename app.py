@@ -176,6 +176,8 @@ def client_raise(data):
 def client_call(data):
     if(data['seat'] == glo.turn and glo.onseat[data['seat']]['money']+glo.onseat[data['seat']]['bet'] >= glo.bet):
         print("call", request.sid, file=sys.stderr)
+        glo.onseat[data['seat']]['money'] = glo.onseat[data['seat']]['money']- glo.bet + glo.onseat[data['seat']]['bet']
+        glo.onseat[data['seat']]['bet'] = glo.bet
         glo.userCollection.update_one(
             {"name": glo.onseat[data['seat']]['name']},
             {"$inc": {"money": -(glo.bet-glo.onseat[data['seat']]['bet'])}}

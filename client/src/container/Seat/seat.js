@@ -15,6 +15,14 @@ const useStyles = makeStyles((theme) => ({
 		height: 150,
 		position: "relative"
 	},
+	turnRoot: {
+		flexGrow: 1,
+		width: 200,
+		height: 150,
+		position: "relative",
+		borderStyle: 'solid',
+		borderColor: 'red'
+	},
 	paper: {
 		padding: theme.spacing(1),
 		textAlign: "center",
@@ -40,6 +48,9 @@ export default function Seat(props) {
 	const { seats } = useSelector((state) => ({
 		seats: state.seats.seats
 	}))
+	const { turn } = useSelector((state) => ({
+		turn: state.table.turn
+	}))
 	const [cards, setCards] = useState(
 		props.id === sitOn && selfCard !== null
 			? selfCard
@@ -51,7 +62,7 @@ export default function Seat(props) {
 				: props.player && props.player.hand)
 	}, [seats])
 	return (
-		<div className={classes.root}>
+		<div className={turn === props.id ? classes.turnRoot : classes.root}>
 			<Grid container spacing={0} justify="space-between">
 				<Card number={cards && cards[0]} left={0}></Card>
 				<Card number={cards && cards[1]} left={60}></Card>
