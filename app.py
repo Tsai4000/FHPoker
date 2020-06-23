@@ -146,7 +146,6 @@ def afterBetCheck():
                 socketio.emit('cards_update', {
                               "selfCard": glo.cards[seat]}, room=glo.onseat[seat]['id'])
             ut.dealPublicCard3()
-            ## TODO:無法正確發牌給個人與公排
         else:
             if(not sa.isGameSet()):
                 ut.dealPublicCard1()
@@ -155,6 +154,7 @@ def afterBetCheck():
                 socketio.emit('player_update', glo.onseat)
                 ut.gameResult()
                 socketio.emit('result_update', glo.cards)
+                ## TODO: check result function work flow
                 ut.prizePool()
     glo.turn = glo.onseat[glo.turn]['nextSeat']
     socketio.emit('table_update', {
