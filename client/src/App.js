@@ -6,7 +6,7 @@ import Login from './container/Login/login'
 import ActionButtons from './container/Actions/actionButtons'
 import { useSelector, useDispatch } from 'react-redux';
 import { setSeats } from './reducer/seats/seatsAction'
-import { setName, setMoney, setSitOn, setIsReady } from './reducer/user/userAction'
+import { setName, setMoney, setSitOn, setIsReady, setSelfCard } from './reducer/user/userAction'
 import { setPool, setButton, setBet, setPublicCards, setTurn } from './reducer/table/tableAction'
 
 function SocketApp() {
@@ -17,10 +17,11 @@ function SocketApp() {
   const { turn } = useSelector(state => ({
     turn: state.table.turn
   }))
-  const { name, money, sitOn } = useSelector((state) => ({
+  const { name, money, sitOn, selfCard } = useSelector((state) => ({
     name: state.user.name,
     money: state.user.money,
-    sitOn: state.user.sitOn
+    sitOn: state.user.sitOn,
+    selfCard: state.user.selfCard
   }))
 
   const [socket, setSocket] = useState(null)
@@ -66,15 +67,8 @@ function SocketApp() {
 
   const cards_update = useCallback((msg) => {
     console.log('cards_update')
-    Object.keys(seats).forEach((key) => {
-      if (seats[key].name === name) {
-        const handupdate = seats
-        handupdate[key].hand = msg.selfCard
-        console.log(handupdate)
-        dispatch(setSeats(handupdate))
-      }
-    })
-  }, [dispatch, seats, name])
+    dispatch(setSelfCard(msg.selfCard))
+  }, [dispatch])
 
   useEffect(() => {
     if (socket != null) {

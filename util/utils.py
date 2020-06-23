@@ -68,6 +68,8 @@ def dealPlayerCard():
         glo.cards[seat] = [glo.deck.pop()]
     for seat in sorted(glo.onseat.keys()):
         glo.cards[seat].append(glo.deck.pop())
+    for seat in glo.onseat:
+        glo.onseat[seat]['hand'] = [0,0]
     print(glo.cards, file=sys.stderr)
 
 

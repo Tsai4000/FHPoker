@@ -1,10 +1,11 @@
-import { SET_NAME, SET_MONEY, SET_SITON, SET_IS_READY } from './userAction'
+import { SET_NAME, SET_MONEY, SET_SITON, SET_IS_READY, SET_SELF_CARD } from './userAction'
 
 const initState = {
   name: null,
   money: null,
   sitOn: null,
-  isReady: null
+  isReady: null,
+  selfCard: null
 }
 
 
@@ -18,6 +19,8 @@ export default function seatReducer(state = initState, action) {
       return { ...state, sitOn: action.sitOn }
     case SET_IS_READY:
       return { ...state, isReady: action.isReady }
+    case SET_SELF_CARD:
+      return { ...state, selfCard: action.selfCard }
     default:
       return state
   }
