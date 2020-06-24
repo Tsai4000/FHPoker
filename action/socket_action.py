@@ -20,6 +20,7 @@ def playerReady():
     )
     glo.pool += glo.bb
     glo.bet = glo.bb
+    sb['bet'] = glo.bb
     print('gamestart', glo.onseat, file=sys.stderr)
     return sb
 
@@ -32,7 +33,7 @@ def raiseBet(data):
     player['bet'] = glo.bet
     glo.userCollection.update_one(
         {"name": player['name']},
-        {"$inc": {"money": player['money']}}
+        {"$set": {"money": player['money']}}###########
     )
 
 

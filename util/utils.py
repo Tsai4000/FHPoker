@@ -88,22 +88,25 @@ def prizePool():
         money = 0
         bet = min([glo.onseat[player]['bet']
                    for player in winner if glo.onseat[player]['bet'] > 0])
+        print(money, bet, winner, file=sys.stderr)
         for player in winner:
             if(glo.onseat[player].get('isAllin', None)):
                 money = bet*len(glo.cards)//len(winner)
                 money = money if money <= glo.pool else glo.pool
             else:
                 money = glo.pool
+            print(player, 'money:', money, file=sys.stderr)
             glo.pool -= money
             glo.userCollection.update_one(
                 {"name": glo.onseat[player]['name']},
                 {"$inc": {"money": money}}
             )
             glo.onseat[player]['money'] += money
+        print(glo.cards, file=sys.stderr)
         for seat in glo.onseat:
             glo.onseat[seat]['bet'] -= bet if glo.onseat[seat]['bet'] > 0 else 0
             if glo.onseat[seat]['bet'] <= 0:
-                glo.cards.popItem(seat, None)
+                glo.cards.pop(seat, None)
 
 
 def cardHandle(cards):
