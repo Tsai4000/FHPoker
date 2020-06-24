@@ -7,7 +7,7 @@ import ActionButtons from './container/Actions/actionButtons'
 import { useSelector, useDispatch } from 'react-redux';
 import { setSeats } from './reducer/seats/seatsAction'
 import { setName, setMoney, setSitOn, setIsReady, setSelfCard } from './reducer/user/userAction'
-import { setPool, setButton, setBB, setBet, setPublicCards, setTurn, setSelfBet } from './reducer/table/tableAction'
+import { setPool, setButton, setBB, setBet, setPublicCards, setTurn, setSelfBet, setIsPlaying } from './reducer/table/tableAction'
 
 function SocketApp() {
   const dispatch = useDispatch()
@@ -88,6 +88,14 @@ function SocketApp() {
     console.log(`Winner is ${seats[winner].name}`)
   }, [dispatch, seats])
 
+  const game_playing = useCallback((msg) => {
+    console.log('game_playing')
+    dispatch(setIsPlaying(msg.playing))
+    if (msg.playing) {
+      dispatch(setSelfCard(null))
+    }
+  }, [dispatch])
+
   useEffect(() => {
     if (socket != null) {
       socket.off('player_update')
@@ -112,6 +120,12 @@ function SocketApp() {
       socket.on('result_update', result_update)
     }
   }, [socket, result_update])
+  useEffect(() => {
+    if (socket != null) {
+      socket.off('game_playing')
+      socket.on('game_playing', game_playing)
+    }
+  }, [socket, game_playing])
 
   const login = useCallback((username, userCode) => {
     fetch(`http://${document.domain}:5000/login`, {
@@ -164,11 +178,11 @@ function SocketApp() {
       <Table socket={funcs} />
       {!name && !money ? <Login login={login} /> : null}
       {!name ? null : <div>{`name: ${name}`}</div>}
-      {!money ? null : <div>{`money: ${money}`}</div>}
+      {money === null ? null : <div>{`money: ${money}`}</div>}
       {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
       {!turn ? null : <div>{`turn: ${turn}`}</div>}
       {!selfBet ? null : <div>{`selfBet: ${selfBet}`}</div>}
-      {name && money && sitOn ? <ActionButtons socket={funcs} /> : null}
+      {name && money !== null && sitOn ? <ActionButtons socket={funcs} /> : null}
     </div>
   )
 }

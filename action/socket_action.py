@@ -6,7 +6,7 @@ import os
 
 def playerReady():
     glo.onseat = ut.sortSeat(glo.onseat)
-
+    ut.clearTable()
     glo.button = sorted(glo.onseat.keys())[glo.rounds % len(glo.onseat)]
     glo.rounds += 1
 
@@ -38,17 +38,20 @@ def raiseBet(data):
 
 
 def allinBet(data):
-    user = glo.userCollection.find_one({"name": data['name']})
+    user = glo.userCollection.find_one({"name": glo.onseat[data['seat']]['name']})
     glo.pool = glo.pool + user['money']
     glo.bet = user['money'] if user['money'] >= glo.bet else glo.bet
     glo.onseat[data['seat']]['isAllin'] = True
+    glo.onseat[data['seat']]['bet'] = user['money']
+    glo.onseat[data['seat']]['money'] = 0
     glo.userCollection.update_one(
-        {"name": data['name']}, {"$set": {"money": 0}})
+        {"name": glo.onseat[data['seat']]['name']}, {"$set": {"money": 0}})
 
 
 def foldCard(data):
     glo.cards.pop(data['seat'], None)
     glo.onseat[data['seat']]['isFold'] = True
+    glo.onseat[data['seat']]['hand'] = [-1,-1]
     prevSeat = glo.onseat[data['seat']]['prevSeat']
     nextSeat = glo.onseat[data['seat']]['nextSeat']
     if(glo.startPlayer == data['seat']):

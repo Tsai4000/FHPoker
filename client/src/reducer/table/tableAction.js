@@ -6,6 +6,7 @@ export const SET_SELF_BET = 'SET_SELF_BET'
 export const SET_START_PLAYER = 'SET_START_PLAYER'
 export const SET_TURN = 'SET_TURN'
 export const SET_PUBLIC_CARDS = 'SET_PUBLIC_CARDS'
+export const SET_IS_PLAYING = 'SET_IS_PLAYING'
 
 export function setPool(pool) {
   return { type: SET_POOL, pool }
@@ -30,4 +31,7 @@ export function setTurn(turn) {
 }
 export function setPublicCards(publicCards) {
   return { type: SET_PUBLIC_CARDS, publicCards }
+}
+export function setIsPlaying(isPlaying) {
+  return { type: SET_IS_PLAYING, isPlaying }
 }

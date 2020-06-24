@@ -1,4 +1,4 @@
-import { SET_POOL, SET_BB, SET_BET, SET_BUTTON, SET_PUBLIC_CARDS, SET_SELF_BET, SET_START_PLAYER, SET_TURN } from './tableAction'
+import { SET_POOL, SET_BB, SET_BET, SET_BUTTON, SET_PUBLIC_CARDS, SET_SELF_BET, SET_START_PLAYER, SET_TURN, SET_IS_PLAYING } from './tableAction'
 
 const initState = {
   pool: 0,
@@ -8,7 +8,8 @@ const initState = {
   publicCards: [],
   selfBet: 0,
   startPlayer: '',
-  turn: ''
+  turn: '',
+  isPlaying: false
 }
 
 export default function seatReducer(state = initState, action) {
@@ -29,6 +30,8 @@ export default function seatReducer(state = initState, action) {
       return { ...state, startPlayer: action.startPlayer }
     case SET_TURN:
       return { ...state, turn: action.turn }
+    case SET_IS_PLAYING:
+      return { ...state, isPlaying: action.isPlaying }
     default:
       return state
   }

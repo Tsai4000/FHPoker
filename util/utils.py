@@ -18,7 +18,7 @@ COEF = {'37': 97425,
 
 def initDeck():
     glo.deck = [card + 1 for card in range(52)]
-    times = random.randint(50, 100)
+    times = random.randint(50, 200)
     for _ in range(times):
         for j in range(51):
             a = random.randint(0, 100)
@@ -149,6 +149,24 @@ def gameResult():
                     maxCards = hand[:i]+hand[i+1:j]+hand[j+1:]
                     maxCardType = cardType
         glo.cards[seat] = (maxScore, maxCards, maxCardType)
+
+
+def gameSet():
+    glo.bb=10
+    glo.deck=[]
+    glo.isReady=0
+    for seat in glo.onseat:
+        glo.onseat[seat]['isReady']=False
+        glo.onseat[seat]['bet']=0
+
+
+def clearTable():
+    glo.pool=0
+    glo.bet=0
+    glo.publicCards=[]
+    initDeck()
+    for seat in glo.onseat:
+        glo.onseat[seat]['hand']=[-1,-1]
 
 
 # def main():

@@ -126,6 +126,7 @@ def player_ready(data):
     glo.onseat[data['seat']]['isReady'] = not glo.onseat[data['seat']]['isReady']
     if(len(glo.onseat) == glo.isReady and len(glo.onseat) != 1):
         sb = sa.playerReady()
+        socketio.emit('game_playing', { "playing": True })
         ut.dealPlayerCard()
         socketio.emit('table_update', {
             "turn": glo.turn, 
@@ -157,11 +158,13 @@ def afterBetCheck():
                 socketio.emit('result_update', glo.cards)
                 ## TODO: check result function work flow
                 ut.prizePool()
+                ut.gameSet()
+                socketio.emit('game_playing', { "playing": False })
     glo.turn = glo.onseat[glo.turn]['nextSeat']
     socketio.emit('table_update', {
                   "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool, "bet": glo.bet})
     socketio.emit('player_update', glo.onseat)
-    print('turn:'+glo.turn, glo.bet, glo.pool, file=sys.stderr)
+    print('turn:',glo.turn, glo.bet, glo.pool, file=sys.stderr)
 
 
 
@@ -186,7 +189,7 @@ def client_call(data):
         )
         afterBetCheck()
 
-
+## TODO: cant allin ,KeyError: 'name'
 @socketio.on('allin')
 def client_allin(data):
     if(data['seat'] == glo.turn):
@@ -207,7 +210,8 @@ def client_fold(data):
                 {"$inc": {"money": glo.pool}}
             )
             glo.onseat[list(glo.cards)[0]]['money']+=glo.pool
-            glo.pool = 0
+            ut.gameSet()
+
         socketio.emit('table_update', {
                       "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool})
         socketio.emit('player_update', glo.onseat)
@@ -215,7 +219,7 @@ def client_fold(data):
 
 @socketio.on('check')
 def client_check(data):
-    if(data['seat'] == glo.turn and glo.bet == glo.onseat[data['seat']]['bet']):
+    if(data['seat'] == glo.turn and (glo.bet == glo.onseat[data['seat']]['bet'] or glo.onseat[data['seat']]['isAllin'])):
         print('check ', data, file=sys.stderr)
         afterBetCheck()
 
