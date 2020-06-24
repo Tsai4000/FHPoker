@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, render_template, make_response
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_cors import cross_origin
 import action.socket_action as sa
 import util.utils as ut
 import util.globalV as glo
@@ -11,8 +12,8 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 app.config["threaded"] = True
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-socketio = SocketIO(app)
+app.config["CORS_ALLOWED_ORIGINS"] = True
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 @app.route('/', methods=['GET'])
@@ -37,6 +38,7 @@ def upload():
 
 
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     if not request.json:
         abort(400)
@@ -57,7 +59,7 @@ def login():
 @socketio.on('disconnect')
 def client_disconnect():
     glo.clients.remove(request.sid)
-    for seat in glo.onseat:
+    for seat in glo.onseat.copy():
         if(glo.onseat[seat]['id'] == request.sid):
             glo.onseat.pop(seat, None)
     socketio.emit('player_update', glo.onseat)
@@ -69,7 +71,7 @@ def client_disconnect():
 def client_connect():
     glo.clients.append(request.sid)
     join_room('default', request.sid)
-    socketio.emit('online_client', {"clientList": glo.clients})
+    socketio.emit('player_update', glo.onseat)
     print('Client '+request.sid+' connected', file=sys.stderr)
 
 
@@ -96,29 +98,46 @@ def player_join(data):
 @socketio.on('sit')
 def player_sit(data):
     user = glo.userCollection.find_one({"name": data['name']})
-    glo.onseat[data['seat']] = {
-        "name": data['name'],
-        "money": user['money'],
-        "bet": 0,
-        'hand': [0, 0],
-        "isReady": False,
-        "isFold": False,
-        "id": request.sid
-    }
+    seatList = [glo.onseat[seat]['name'] for seat in glo.onseat]
+    if(data['seat'] not in glo.onseat and data['name'] not in seatList):
+        glo.onseat[data['seat']] = {
+            "name": user['name'],
+            "money": user['money'],
+            "bet": 0,
+            'hand': [-1, -1],
+            "isReady": False,
+            "isFold": False,
+            "id": request.sid,
+            "isAllin": False
+        }
+    elif(data['seat'] not in glo.onseat and data['name'] in seatList): 
+        for seat in glo.onseat.copy():
+            if(glo.onseat[seat]['name'] == data['name']):
+                glo.onseat[data['seat']] = glo.onseat[seat]
+                glo.onseat.pop(seat, None)
+                break
     socketio.emit('player_update', glo.onseat)
     print('Seat:', glo.onseat, file=sys.stderr)
 
 
 @socketio.on('click_ready')
 def player_ready(data):
-    glo.isReady += -1 if glo.onseat[data.seat]['isReady'] else 1
-    glo.onseat[data.seat]['isReady'] = not glo.onseat[data.seat]['isReady']
+    glo.isReady += -1 if glo.onseat[data['seat']]['isReady'] else 1
+    glo.onseat[data['seat']]['isReady'] = not glo.onseat[data['seat']]['isReady']
     if(len(glo.onseat) == glo.isReady and len(glo.onseat) != 1):
         sb = sa.playerReady()
         ut.dealPlayerCard()
         socketio.emit('table_update', {
-                      "turn": glo.turn, "button": glo.button, "sb": sb['name'], "publicCards": glo.publicCards})
+            "turn": glo.turn, 
+            "button": glo.button, 
+            "sb": sb['name'], 
+            "publicCards": glo.publicCards, 
+            'pool': glo.pool, 
+            'bet': glo.bet,
+            'bb': glo.bb})
     socketio.emit('player_update', glo.onseat)
+    print('turn:'+glo.turn, glo.bet, glo.pool, file=sys.stderr)
+
 
 
 def afterBetCheck():
@@ -128,72 +147,76 @@ def afterBetCheck():
                 socketio.emit('cards_update', {
                               "selfCard": glo.cards[seat]}, room=glo.onseat[seat]['id'])
             ut.dealPublicCard3()
-        if(not sa.isGameSet()):
-            ut.dealPublicCard1()
         else:
-            sa.showDown()
-            socketio.emit('player_update', glo.onseat)
-            ut.gameResult()
-            socketio.emit('result_update', glo.cards)
-            ut.prizePool()
+            if(not sa.isGameSet()):
+                ut.dealPublicCard1()
+            else:
+                sa.showDown()
+                socketio.emit('player_update', glo.onseat)
+                ut.gameResult()
+                socketio.emit('result_update', glo.cards)
+                ## TODO: check result function work flow
+                ut.prizePool()
     glo.turn = glo.onseat[glo.turn]['nextSeat']
     socketio.emit('table_update', {
-                  "turn": glo.turn, "publicCards": glo.publicCards})
+                  "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool, "bet": glo.bet})
     socketio.emit('player_update', glo.onseat)
-    socketio.emit('pool_update', {"pool": glo.pool})
-    socketio.emit('bet_update', {"bet": glo.bet})
+    print('turn:'+glo.turn, glo.bet, glo.pool, file=sys.stderr)
+
 
 
 @socketio.on('raise')
 def client_raise(data):
-    print("raise", data, request.sid, file=sys.stderr)
-    if(data.seat == glo.turn and glo.onseat[data.seat]['money']+glo.onseat[data.seat]['bet'] >= glo.bet+glo.bb):
+    if(data['seat'] == glo.turn and glo.onseat[data['seat']]['money']+glo.onseat[data['seat']]['bet'] >= glo.bet+glo.bb):
+        print("raise", data, file=sys.stderr)
         sa.raiseBet(data)
         afterBetCheck()
 
 
 @socketio.on('call')
 def client_call(data):
-    print("call", request.sid, file=sys.stderr)
-    if(data.seat == glo.turn and glo.onseat[data.seat]['money']+glo.onseat[data.seat]['bet'] >= glo.bet):
+    if(data['seat'] == glo.turn and glo.onseat[data['seat']]['money']+glo.onseat[data['seat']]['bet'] >= glo.bet):
+        print("call", data, file=sys.stderr)
+        glo.onseat[data['seat']]['money'] = glo.onseat[data['seat']]['money']- glo.bet + glo.onseat[data['seat']]['bet']
+        glo.pool = glo.pool + (glo.bet-glo.onseat[data['seat']]['bet'])
+        glo.onseat[data['seat']]['bet'] = glo.bet
         glo.userCollection.update_one(
-            {"name": data['name']},
-            {"$set": {"money": data['money']-glo.bet}}
+            {"name": glo.onseat[data['seat']]['name']},
+            {"$set": {"money": glo.onseat[data['seat']]['money']}}
         )
-        glo.pool = glo.pool + glo.bet
         afterBetCheck()
 
 
 @socketio.on('allin')
 def client_allin(data):
-    print("allin", request.sid, file=sys.stderr)
-    if(data.seat == glo.turn):
+    if(data['seat'] == glo.turn):
+        print("allin", data, file=sys.stderr)
         sa.allinBet(data)
         afterBetCheck()
 
-
+## TODO: finish fold game end flow
 @socketio.on('fold')
 def client_fold(data):
-    print('fold ', data.seat, file=sys.stderr)
-    if(data.seat == glo.turn):
+    if(data['seat'] == glo.turn):
+        print('fold ', data, file=sys.stderr)
         sa.foldCard(data)
-        if(glo.onseat[data.seat]['nextSeat'] == glo.onseat[data.seat]['prevSeat'] and len(glo.cards) == 1):
-            print("end")
+        if(glo.onseat[data['seat']]['nextSeat'] == glo.onseat[data['seat']]['prevSeat'] and len(glo.cards) == 1):
+            print("end", file=sys.stderr)
             glo.userCollection.update_one(
-                {"name": glo.onseat[glo.cards.keys()[0]]['name']},
+                {"name": glo.onseat[list(glo.cards)[0]]['name']},
                 {"$inc": {"money": glo.pool}}
             )
+            glo.onseat[list(glo.cards)[0]]['money']+=glo.pool
             glo.pool = 0
         socketio.emit('table_update', {
-                      "turn": glo.turn, "publicCards": glo.publicCards})
+                      "turn": glo.turn, "publicCards": glo.publicCards, "pool": glo.pool})
         socketio.emit('player_update', glo.onseat)
-        socketio.emit('pool_update', {"pool": glo.pool})
 
 
 @socketio.on('check')
 def client_check(data):
-    print('check ', request.sid, file=sys.stderr)
-    if(data.seat == glo.turn and glo.bet == glo.onseat[data.seat]['bet']):
+    if(data['seat'] == glo.turn and glo.bet == glo.onseat[data['seat']]['bet']):
+        print('check ', data, file=sys.stderr)
         afterBetCheck()
 
 
@@ -201,4 +224,4 @@ if __name__ == "__main__":
     glo.init()
     ut.initDB()
     ut.initDeck()
-    socketio.run(app, debug=True, host='127.0.0.1', port=5000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)

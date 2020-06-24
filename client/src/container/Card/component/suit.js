@@ -1,6 +1,5 @@
 import React, { useCallback } from "react"
 import { makeStyles } from '@material-ui/core'
-import { SvgIcon } from '@material-ui/core'
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord'
 import DeviceHubIcon from '@material-ui/icons/DeviceHub'
 import FavoriteIcon from '@material-ui/icons/Favorite'
@@ -23,7 +22,7 @@ const useStyle = makeStyles((theme) => ({
 export default function Suit(props) {
   const classes = useStyle()
 
-  const spade = useCallback(() => {
+  const spade = function () {
     return (
       <div className={classes.box}>
         <FiberManualRecordIcon className={classes.component} style={{ top: 0, left: 8 }}></FiberManualRecordIcon>
@@ -32,37 +31,38 @@ export default function Suit(props) {
         <DeviceHubIcon className={classes.component} style={{ top: 20, left: 8 }}></DeviceHubIcon>
       </div>
     )
-  })
-  const heart = useCallback(() => {
+  }
+
+  const heart = function () {
     return (
       <div className={classes.box}>
         <FavoriteIcon fontSize={'large'} style={{ color: 'red' }}></FavoriteIcon>
       </div>
     )
-  })
-  const club = useCallback(() => {
+  }
+  const club = function () {
     return (
       <div className={classes.box}>
         <FavoriteIcon fontSize={'large'} style={{ color: 'black', transform: 'rotate(180deg)' }}></FavoriteIcon>
         <DeviceHubIcon className={classes.component} style={{ top: 20, left: 8 }}></DeviceHubIcon>
       </div>
     )
-  })
-  const diamond = useCallback(() => {
+  }
+  const diamond = function () {
     return (
       <div className={classes.box}>
         <StopIcon fontSize={'large'} style={{ color: 'red', transform: 'rotate(45deg)' }}></StopIcon>
       </div>
     )
-  })
+  }
 
 
   return (
     <div>
-      {props.suit == "club" ? club()
-        : props.suit == "heart" ? heart()
-          : props.suit == "diamond" ? diamond()
-            : props.suit == "spade" ? spade()
+      {props.suit === "club" ? club()
+        : props.suit === "heart" ? heart()
+          : props.suit === "diamond" ? diamond()
+            : props.suit === "spade" ? spade()
               : 'none'}
     </div>
   )

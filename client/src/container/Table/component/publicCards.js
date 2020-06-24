@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Card from '../../Card/card'
-import { element } from "prop-types";
 
 export default function PublicCards(props) {
 

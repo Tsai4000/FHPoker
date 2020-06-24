@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import { Paper } from "@material-ui/core"
 
-const useStyle = makeStyles((theme) => ({
+const useStyle = makeStyles(() => ({
   root: {
     width: 140,
     height: 20,
