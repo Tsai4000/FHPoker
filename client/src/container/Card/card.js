@@ -21,7 +21,7 @@ export default function Card(props) {
 
   const suitList = ['spade', 'heart', 'diamond', 'club']
   const suit = props.number === -1 ? null : props.number === 0 ? 'none' : suitList[Math.floor((props.number - 1) / 13)]
-  const number = props.number % 13
+  const number = props.number % 13 === 0 ? 13 : props.number % 13
 
   const cardBack = useCallback(() => {
     return (

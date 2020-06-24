@@ -7,15 +7,16 @@ import ActionButtons from './container/Actions/actionButtons'
 import { useSelector, useDispatch } from 'react-redux';
 import { setSeats } from './reducer/seats/seatsAction'
 import { setName, setMoney, setSitOn, setIsReady, setSelfCard } from './reducer/user/userAction'
-import { setPool, setButton, setBet, setPublicCards, setTurn } from './reducer/table/tableAction'
+import { setPool, setButton, setBB, setBet, setPublicCards, setTurn, setSelfBet } from './reducer/table/tableAction'
 
 function SocketApp() {
   const dispatch = useDispatch()
   const { seats } = useSelector(state => ({
     seats: state.seats.seats
   }))
-  const { turn } = useSelector(state => ({
-    turn: state.table.turn
+  const { turn, selfBet } = useSelector(state => ({
+    turn: state.table.turn,
+    selfBet: state.table.selfBet
   }))
   const { name, money, sitOn, selfCard } = useSelector((state) => ({
     name: state.user.name,
@@ -34,6 +35,7 @@ function SocketApp() {
         dispatch(setSitOn(seat))
         dispatch(setIsReady(msg[seat].isReady))
         dispatch(setMoney(msg[seat].money))
+        dispatch(setSelfBet(msg[seat].bet))
       }
     })
     dispatch(setSeats(msg))
@@ -58,6 +60,9 @@ function SocketApp() {
         case 'bet':
           dispatch(setBet(msg[key]))
           break
+        case 'bb':
+          dispatch(setBB(msg[key]))
+          break
         default:
           return null
       }
@@ -70,21 +75,43 @@ function SocketApp() {
     dispatch(setSelfCard(msg.selfCard))
   }, [dispatch])
 
+  const result_update = useCallback((msg) => {
+    console.log('result_update')
+    let winner = null
+    let maxScore = 0
+    Object.keys(msg).forEach((key) => {
+      console.log(msg[key])
+      if (msg[key][0] > maxScore) {
+        winner = key
+      }
+    })
+    console.log(`Winner is ${seats[winner].name}`)
+  }, [dispatch, seats])
+
   useEffect(() => {
     if (socket != null) {
+      socket.off('player_update')
       socket.on('player_update', player_update)
     }
   }, [socket, player_update])
   useEffect(() => {
     if (socket != null) {
+      socket.off('table_update')
       socket.on('table_update', table_update)
     }
   }, [socket, table_update])
   useEffect(() => {
     if (socket != null) {
+      socket.off('cards_update')
       socket.on('cards_update', cards_update)
     }
   }, [socket, cards_update])
+  useEffect(() => {
+    if (socket != null) {
+      socket.off('result_update')
+      socket.on('result_update', result_update)
+    }
+  }, [socket, result_update])
 
   const login = useCallback((username, userCode) => {
     fetch(`http://${document.domain}:5000/login`, {
@@ -113,6 +140,7 @@ function SocketApp() {
   }, [setSocket, dispatch])
 
   const sitDown = useCallback((data) => {
+    // TODO: fix can click without login
     socket.emit('sit', data)
   }, [socket])
 
@@ -121,7 +149,9 @@ function SocketApp() {
   }, [socket])
 
   const emit = useCallback((type, data) => {
+    console.log(type, data, turn)
     if (turn === data.seat) {
+      console.log(`emit ${type}`)
       socket.emit(type, data)
     }
   }, [socket, turn])
@@ -137,6 +167,7 @@ function SocketApp() {
       {!money ? null : <div>{`money: ${money}`}</div>}
       {!sitOn ? null : <div>{`sit on ${sitOn}`}</div>}
       {!turn ? null : <div>{`turn: ${turn}`}</div>}
+      {!selfBet ? null : <div>{`selfBet: ${selfBet}`}</div>}
       {name && money && sitOn ? <ActionButtons socket={funcs} /> : null}
     </div>
   )

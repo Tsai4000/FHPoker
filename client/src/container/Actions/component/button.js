@@ -14,19 +14,19 @@ export default function ActionButtons(props) {
   const classes = useStyle()
   const { selfBet, bet, bb } = useSelector((state) => ({ selfBet: state.table.selfBet, bet: state.table.bet, bb: state.table.bb }))
   const { sitOn, money } = useSelector((state) => ({ sitOn: state.user.sitOn, money: state.user.money }))
-
+  const { seats } = useSelector((state) => ({ seats: state.seats.seats }))
   const handleClick = useCallback(() => {
-    console.log(selfBet, money)
-    if (props.type === 'raise' && selfBet > bet + bb) {
+    console.log(`click ${props.type}`)
+    if (props.type === 'raise') {
       if (selfBet >= money) {
         props.socket.emit('allin', { seat: sitOn })
-      } else {
+      } else if (selfBet >= bet + bb) {
         props.socket.emit(props.type, { seat: sitOn, bet: selfBet })
       }
     } else {
       props.socket.emit(props.type, { seat: sitOn })
     }
-  }, [money, selfBet, sitOn])
+  }, [money, selfBet, sitOn, bet, bb, seats])
 
   return (
     <>

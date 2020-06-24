@@ -33,7 +33,11 @@ export default function StatusUI(props) {
 
   useEffect(() => {
     if (props.player) {
-      setStatus(props.player.isReady === false ? 'Ready?' : 'Waiting')
+      setStatus(props.player.isReady === false
+        ? 'Ready?'
+        : props.player.bet != 0
+          ? props.player.bet
+          : 'Waiting')
     } else {
       setStatus('empty')
     }
